@@ -3,61 +3,61 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dollyhrtzn — Sales Tracker</title>
+  <title>Ryde — Sales Tracker</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     :root {
-      --background: #f7f3fb;
-      --foreground: #261b32;
+      --background: #faf6f7;
+      --foreground: #1f0d12;
       --card: #ffffff;
-      --card-foreground: #261b32;
-      --sidebar: #f2ebf9;
-      --sidebar-foreground: #322440;
-      --sidebar-accent: #e6d8f3;
-      --muted: #efe8f6;
-      --muted-foreground: #6e5d7e;
-      --primary: #8842c7;
-      --primary-hover: #7635b0;
+      --card-foreground: #1f0d12;
+      --sidebar: #f4ecee;
+      --sidebar-foreground: #2d131a;
+      --sidebar-accent: #eadadd;
+      --muted: #f0e4e7;
+      --muted-foreground: #73575f;
+      --primary: #801b2a;
+      --primary-hover: #681421;
       --primary-foreground: #ffffff;
-      --primary-soft: rgba(136, 66, 199, 0.12);
-      --border: #e2d4ed;
-      --input: #dfd0eb;
+      --primary-soft: rgba(128, 27, 42, 0.12);
+      --border: #e4d2d6;
+      --input: #dfc9ce;
       --success: #10b981;
       --warning: #f59e0b;
       --destructive: #ef4444;
-      --chart-1: #ec4899;
-      --chart-2: #8b5cf6;
-      --chart-3: #3b82f6;
+      --chart-1: #be123c;
+      --chart-2: #801b2a;
+      --chart-3: #e11d48;
       --chart-4: #f59e0b;
       --chart-5: #10b981;
       --radius: 16px;
     }
 
     html.dark {
-      --background: #110d16;
-      --foreground: #e6e1ea;
-      --card: #19141f;
-      --card-foreground: #e6e1ea;
-      --sidebar: #16121c;
-      --sidebar-foreground: #d8d0e0;
-      --sidebar-accent: #251e2e;
-      --muted: #231d2b;
-      --muted-foreground: #8b8096;
-      --primary: #a86add;
-      --primary-hover: #9654ce;
+      --background: #0a0608;
+      --foreground: #f2eaec;
+      --card: #130b0e;
+      --card-foreground: #f2eaec;
+      --sidebar: #0f080b;
+      --sidebar-foreground: #e3d5d8;
+      --sidebar-accent: #221117;
+      --muted: #1d1015;
+      --muted-foreground: #9e878e;
+      --primary: #9e2a3b;
+      --primary-hover: #84202f;
       --primary-foreground: #ffffff;
-      --primary-soft: rgba(168, 106, 221, 0.15);
-      --border: #2d2636;
-      --input: #282130;
+      --primary-soft: rgba(158, 42, 59, 0.16);
+      --border: #2c181f;
+      --input: #26141b;
       --success: #22c55e;
       --warning: #eab308;
       --destructive: #f87171;
-      --chart-1: #e879f9;
-      --chart-2: #a855f7;
-      --chart-3: #38bdf8;
+      --chart-1: #e11d48;
+      --chart-2: #9e2a3b;
+      --chart-3: #f43f5e;
       --chart-4: #fbbf24;
       --chart-5: #34d399;
     }
@@ -495,7 +495,7 @@
     }
 
     .stat-card:hover {
-      border-color: rgba(168, 106, 221, 0.4);
+      border-color: rgba(158, 42, 59, 0.45);
     }
 
     .stat-icon {
@@ -727,7 +727,7 @@
     }
 
     table.clean-table tbody tr:hover {
-      background-color: rgba(168, 106, 221, 0.04);
+      background-color: rgba(158, 42, 59, 0.05);
     }
 
     /* Badges */
@@ -1119,7 +1119,7 @@
             <path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/>
           </svg>
           <div>
-            <h2 class="brand-script">Dollyhrtzn</h2>
+            <h2 class="brand-script">Ryde</h2>
             <p class="brand-tag">Sales Tracker</p>
           </div>
         </div>
@@ -1172,9 +1172,9 @@
 
       <div class="sidebar-footer">
         <div class="user-mini">
-          <div class="user-avatar-sm" id="userAvatar">D</div>
+          <div class="user-avatar-sm" id="userAvatar">R</div>
           <div class="user-mini-info">
-            <p class="user-mini-name" id="userName">dollyhrtzn</p>
+            <p class="user-mini-name" id="userName">ryde</p>
             <p class="user-mini-role" id="userRole">Owner</p>
           </div>
         </div>
@@ -1193,7 +1193,7 @@
           <button class="menu-trigger" id="openSidebarBtn" aria-label="Open menu">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
           </button>
-          <span class="mobile-brand-text">Dollyhrtzn</span>
+          <span class="mobile-brand-text">Ryde</span>
         </div>
 
         <div class="header-right">
@@ -2210,7 +2210,7 @@
     });
 
     // =================== FIREBASE CONFIGURATION ===================
-    const APP_NAME = '@dollyhrtzn';
+    const APP_NAME = 'ryde';
     const firebaseConfig = {
       apiKey: "AIzaSyDKkWYavtCU1JE5JlvUXHSr90MqqisGtgM",
       authDomain: "maisonetoile-5eee1.firebaseapp.com",
@@ -2365,7 +2365,8 @@
         window.location.href = 'index.html';
         return false;
       }
-      if (!currentSession || !currentSession.username) {
+      if (!currentSession || !currentSession.username || currentSession.appName !== APP_NAME) {
+        localStorage.removeItem('session');
         window.location.href = 'index.html';
         return false;
       }
@@ -2885,7 +2886,7 @@
     function updateCharts() {
       const filtered = getFilteredSales();
       const isDark = document.documentElement.classList.contains('dark');
-      const textColor = isDark ? '#8b8096' : '#6e5d7e';
+      const textColor = isDark ? '#9e878e' : '#73575f';
       const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
 
       // Status Doughnut Chart
@@ -2900,7 +2901,7 @@
             labels: ['Verified / Sold', 'Pending'],
             datasets: [{
               data: soldCount === 0 && pendingCount === 0 ? [1, 0] : [soldCount, pendingCount],
-              backgroundColor: ['#a86add', '#eab308'],
+              backgroundColor: ['#9e2a3b', '#eab308'],
               borderWidth: 0
             }]
           },
@@ -2934,8 +2935,8 @@
             datasets: [{
               label: 'Sales (₱)',
               data: values.length ? values : [0],
-              borderColor: '#a86add',
-              backgroundColor: 'rgba(168, 106, 221, 0.15)',
+              borderColor: '#9e2a3b',
+              backgroundColor: 'rgba(158, 42, 59, 0.18)',
               fill: true,
               tension: 0.35
             }]

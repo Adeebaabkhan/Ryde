@@ -3,43 +3,43 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dollyhrtzn — Sales Tracker</title>
+  <title>Ryde — Sales Tracker</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --background: #f7f3fb;
-      --foreground: #261b32;
+      --background: #faf6f7;
+      --foreground: #1f0d12;
       --card: #ffffff;
-      --card-foreground: #261b32;
-      --muted: #efe8f6;
-      --muted-foreground: #6e5d7e;
-      --primary: #8842c7;
-      --primary-hover: #7635b0;
+      --card-foreground: #1f0d12;
+      --muted: #f0e4e7;
+      --muted-foreground: #73575f;
+      --primary: #801b2a;
+      --primary-hover: #681421;
       --primary-foreground: #ffffff;
-      --primary-soft: rgba(136, 66, 199, 0.12);
-      --border: #e2d4ed;
-      --input: #dfd0eb;
+      --primary-soft: rgba(128, 27, 42, 0.12);
+      --border: #e4d2d6;
+      --input: #dfc9ce;
       --destructive: #ef4444;
-      --shadow: 0 10px 30px -10px rgba(136, 66, 199, 0.15);
+      --shadow: 0 10px 30px -10px rgba(128, 27, 42, 0.18);
     }
 
     html.dark {
-      --background: #110d16;
-      --foreground: #e6e1ea;
-      --card: #19141f;
-      --card-foreground: #e6e1ea;
-      --muted: #231d2b;
-      --muted-foreground: #8b8096;
-      --primary: #a86add;
-      --primary-hover: #9755cf;
+      --background: #0a0608;
+      --foreground: #f2eaec;
+      --card: #130b0e;
+      --card-foreground: #f2eaec;
+      --muted: #1d1015;
+      --muted-foreground: #9e878e;
+      --primary: #9e2a3b;
+      --primary-hover: #84202f;
       --primary-foreground: #ffffff;
-      --primary-soft: rgba(168, 106, 221, 0.14);
-      --border: #2d2636;
-      --input: #282130;
+      --primary-soft: rgba(158, 42, 59, 0.16);
+      --border: #2c181f;
+      --input: #26141b;
       --destructive: #f87171;
-      --shadow: 0 12px 36px -8px rgba(0, 0, 0, 0.5);
+      --shadow: 0 12px 36px -8px rgba(0, 0, 0, 0.65);
     }
 
     * {
@@ -530,7 +530,7 @@
         <path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/>
       </svg>
       <div>
-        <h1 class="brand-title">Dollyhrtzn</h1>
+        <h1 class="brand-title">Ryde</h1>
         <p class="brand-sub">Sales Tracker</p>
       </div>
     </div>
@@ -548,8 +548,8 @@
 
   <!-- Center Profile Picker -->
   <main class="main-container">
-    <h2 class="center-script">Dollyhrtzn</h2>
-    <p class="center-subtitle">Who's using Dollyhrtzn?</p>
+    <h2 class="center-script">Ryde</h2>
+    <p class="center-subtitle">Who's using Ryde?</p>
 
     <div id="profilesGrid" class="profiles-grid">
       <div class="skeleton-card"></div>
@@ -570,8 +570,8 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
       </button>
       <div class="modal-header-center">
-        <div id="modalAvatar" class="profile-avatar" style="margin-bottom: 12px;">D</div>
-        <h3 id="modalUsername" class="modal-title">@dollyhrtzn</h3>
+        <div id="modalAvatar" class="profile-avatar" style="margin-bottom: 12px;">R</div>
+        <h3 id="modalUsername" class="modal-title">Ryde</h3>
         <p class="modal-desc">Enter your PIN / password to sign in</p>
       </div>
       <form id="pinLoginForm">
@@ -660,7 +660,7 @@
     });
 
     // Firebase Configuration
-    const APP_NAME = '@dollyhrtzn';
+    const APP_NAME = 'ryde';
     const firebaseConfig = {
       apiKey: "AIzaSyDKkWYavtCU1JE5JlvUXHSr90MqqisGtgM",
       authDomain: "maisonetoile-5eee1.firebaseapp.com",
@@ -712,9 +712,11 @@
       if (session) {
         try {
           const parsed = JSON.parse(session);
-          if (parsed && parsed.username) {
+          if (parsed && parsed.username && parsed.appName === APP_NAME) {
             window.location.href = 'dashboard.html';
             return;
+          } else {
+            localStorage.removeItem('session');
           }
         } catch (e) {
           localStorage.removeItem('session');
@@ -722,29 +724,10 @@
       }
     });
 
-    // Ensure Default Owner & Load Profiles
+    // Load Profiles
     let profilesList = [];
     let selectedProfile = null;
     let avatarsCache = {};
-
-    async function ensureDefaultOwner() {
-      try {
-        const ownerKey = sanitizeFirebaseKey('@dollyhrtzn');
-        const ownerRef = getRef(`users/${ownerKey}`);
-        const snapshot = await ownerRef.once('value');
-        if (!snapshot.exists()) {
-          await ownerRef.set({
-            username: '@dollyhrtzn',
-            customName: 'dollyhrtzn',
-            password: hashPassword('dollhartz'),
-            role: 'owner',
-            createdAt: new Date().toISOString()
-          });
-        }
-      } catch (e) {
-        console.error('Error initializing default owner:', e);
-      }
-    }
 
     // Listen to user avatars in settings
     getRef('settings').on('value', (snap) => {
@@ -758,21 +741,19 @@
       renderProfiles();
     });
 
-    ensureDefaultOwner().then(() => {
-      getRef('users').on('value', (snapshot) => {
-        const usersObj = snapshot.val() || {};
-        profilesList = Object.entries(usersObj).map(([key, val]) => ({
-          key,
-          ...val
-        }));
-        // Sort owner first, then alphabetically
-        profilesList.sort((a, b) => {
-          if (a.role === 'owner' && b.role !== 'owner') return -1;
-          if (a.role !== 'owner' && b.role === 'owner') return 1;
-          return (a.customName || a.username || '').localeCompare(b.customName || b.username || '');
-        });
-        renderProfiles();
+    getRef('users').on('value', (snapshot) => {
+      const usersObj = snapshot.val() || {};
+      profilesList = Object.entries(usersObj).map(([key, val]) => ({
+        key,
+        ...val
+      }));
+      // Sort owner first, then alphabetically
+      profilesList.sort((a, b) => {
+        if (a.role === 'owner' && b.role !== 'owner') return -1;
+        if (a.role !== 'owner' && b.role === 'owner') return 1;
+        return (a.customName || a.username || '').localeCompare(b.customName || b.username || '');
       });
+      renderProfiles();
     });
 
     function renderProfiles() {
@@ -892,6 +873,7 @@
         }
 
         const session = {
+          appName: APP_NAME,
           id: userData.id || selectedProfile.key || userData.username,
           username: userData.username,
           role: userData.role,
@@ -919,7 +901,8 @@
     function openAddProfileModal() {
       document.getElementById('newUsername').value = '';
       document.getElementById('newPin').value = '';
-      document.getElementById('newRole').value = 'admin';
+      const hasOwner = profilesList.some(p => (p.role || '').toLowerCase() === 'owner');
+      document.getElementById('newRole').value = hasOwner ? 'admin' : 'owner';
       addProfileError.textContent = '';
       addProfileError.classList.remove('show');
       addProfileModal.classList.add('open');
