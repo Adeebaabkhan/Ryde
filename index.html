@@ -706,6 +706,21 @@
       }
     });
 
+    // Sync custom Shop Name if configured by Owner
+    getRef('settings/owner/shopConfig').on('value', (snap) => {
+      const cfg = snap.val();
+      if (cfg && cfg.shopName) {
+        const name = cfg.shopName.trim();
+        document.title = `${name} - Sales Tracker`;
+        const brandTitle = document.querySelector('.brand-title');
+        const centerScript = document.querySelector('.center-script');
+        const centerSub = document.querySelector('.center-subtitle');
+        if (brandTitle) brandTitle.textContent = name;
+        if (centerScript) centerScript.textContent = name;
+        if (centerSub) centerSub.textContent = `Who's using ${name}?`;
+      }
+    });
+
     // Check active session
     window.addEventListener('DOMContentLoaded', () => {
       const session = localStorage.getItem('session');

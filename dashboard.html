@@ -1437,9 +1437,11 @@
           <div class="page-header">
             <div>
               <h1 class="page-title">Salary Rules</h1>
-              <p class="page-subtitle">Commission brackets based on unit sale price</p>
+              <p class="page-subtitle">Commission brackets & salary formula (Sales – Capital = Profit, Profit × Rate% = Salary)</p>
             </div>
             <div class="header-controls" id="ownerBracketActions" style="display:none;">
+              <button class="btn btn-outline" onclick="recalculateAllSalesCommissions()">Recalculate Past Sales</button>
+              <button class="btn btn-outline" onclick="resetDefaultBrackets()">Reset Defaults</button>
               <button class="btn btn-primary" onclick="openAddBracketModal()">+ Add Bracket</button>
             </div>
           </div>
@@ -1447,37 +1449,44 @@
           <div class="charts-grid">
             <div class="panel-card">
               <div class="panel-title">
-                <span>Commission Brackets</span>
+                <span>®️ Salary Formula & Sales Brackets</span>
+              </div>
+              <div style="padding:12px 14px; background:var(--muted); border:1px solid var(--border); border-radius:10px; margin-bottom:14px; font-size:13px; line-height:1.7;">
+                <div style="font-weight:600; color:var(--foreground); margin-bottom:4px;">Formula:</div>
+                <div style="color:var(--muted-foreground);">
+                  <strong style="color:var(--foreground);">Sales – Capital = Profit</strong><br>
+                  <strong style="color:var(--primary);">Profit × Rate% = Salary</strong>
+                </div>
               </div>
               <div id="commissionBracketsList"></div>
             </div>
 
             <div class="panel-card">
               <div class="panel-title">
-                <span>Commission Simulator</span>
+                <span>Salary Calculator / Simulator</span>
               </div>
               <div class="form-grid">
                 <div class="form-field">
-                  <label>Test Sale Price (₱)</label>
-                  <input type="number" id="simPriceInput" class="input-control" value="150" min="0" step="1" oninput="updateSalarySimulator()">
+                  <label>Total Sales (₱)</label>
+                  <input type="number" id="simPriceInput" class="input-control" value="600" min="0" step="1" oninput="updateSalarySimulator()">
                 </div>
                 <div class="form-field">
-                  <label>Quantity</label>
-                  <input type="number" id="simQtyInput" class="input-control" value="1" min="1" step="1" oninput="updateSalarySimulator()">
+                  <label>Total Capital / Cost (₱)</label>
+                  <input type="number" id="simCapitalInput" class="input-control" value="350" min="0" step="1" oninput="updateSalarySimulator()">
                 </div>
               </div>
               <div class="summary-strip" style="margin-top: 16px;">
                 <div>
-                  <div class="metric-mini-label">Total Sale</div>
-                  <div class="metric-mini-val" id="simTotalSale">₱150.00</div>
+                  <div class="metric-mini-label">Profit (Sales – Cap)</div>
+                  <div class="metric-mini-val" style="color:var(--success);" id="simTotalProfit">₱250.00</div>
                 </div>
                 <div>
-                  <div class="metric-mini-label">Bracket Rate</div>
-                  <div class="metric-mini-val" id="simRate">10%</div>
+                  <div class="metric-mini-label">Sales Bracket Rate</div>
+                  <div class="metric-mini-val" id="simRate">30%</div>
                 </div>
                 <div>
-                  <div class="metric-mini-label">Admin Salary</div>
-                  <div class="metric-mini-val" style="color:var(--primary);" id="simSalary">₱15.00</div>
+                  <div class="metric-mini-label">Salary (Profit × Rate%)</div>
+                  <div class="metric-mini-val" style="color:var(--primary);" id="simSalary">₱75.00</div>
                 </div>
               </div>
             </div>
@@ -1524,6 +1533,7 @@
                     <th>Method</th>
                     <th>Reference</th>
                     <th>Notes</th>
+                    <th class="owner-col">Action</th>
                   </tr>
                 </thead>
                 <tbody id="payoutHistoryBody"></tbody>
@@ -1537,10 +1547,10 @@
           <div class="page-header">
             <div>
               <h1 class="page-title">Manage Users</h1>
-              <p class="page-subtitle">Add admins and configure commission rules</p>
+              <p class="page-subtitle">Add team profiles and customize commission rules, PINs, and roles</p>
             </div>
             <div class="header-controls">
-              <button class="btn btn-primary" onclick="openAddUserModal()">+ Add Admin</button>
+              <button class="btn btn-primary" onclick="openAddUserModal()">+ Add Profile</button>
             </div>
           </div>
 
@@ -1552,7 +1562,7 @@
           <div class="page-header">
             <div>
               <h1 class="page-title">Settings</h1>
-              <p class="page-subtitle">Profile, appearance, and data management</p>
+              <p class="page-subtitle">Profile, shop branding, appearance, and data management</p>
             </div>
           </div>
 
@@ -1575,6 +1585,29 @@
                   <input type="password" id="settingsNewPassword" class="input-control" placeholder="New PIN or password">
                 </div>
                 <button type="submit" class="btn btn-primary">Save Profile</button>
+              </form>
+            </div>
+
+            <div class="panel-card" id="ownerShopSettingsCard" style="display:none;">
+              <div class="panel-title">
+                <span>Owner Shop & Commission Defaults</span>
+              </div>
+              <form id="ownerShopSettingsForm" class="form-grid">
+                <div class="form-field">
+                  <label>Shop / Brand Name</label>
+                  <input type="text" id="settingsShopName" class="input-control" placeholder="Ryde" required>
+                </div>
+                <div class="form-grid two-col">
+                  <div class="form-field">
+                    <label>Currency Symbol</label>
+                    <input type="text" id="settingsCurrencySymbol" class="input-control" value="₱" maxlength="4" required>
+                  </div>
+                  <div class="form-field">
+                    <label>Default Fallback Comm (%)</label>
+                    <input type="number" id="settingsDefaultRate" class="input-control" value="20" min="0" max="100" step="0.5" required>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Save Shop Settings</button>
               </form>
             </div>
 
@@ -1625,8 +1658,33 @@
             <input type="number" id="productQuantity" class="input-control" value="1" min="1" required>
           </div>
           <div class="form-field">
-            <label>Unit Sale Price (₱)</label>
+            <label>Unit Sale Price</label>
             <input type="number" id="productPriceInput" class="input-control" step="0.01" min="0" required>
+          </div>
+        </div>
+
+        <!-- Owner-Only Sale Overrides (Cost, Custom Commission, Date, Assigned User) -->
+        <div id="ownerSaleOverrides" style="display:none; border:1px solid var(--border); background:var(--muted); border-radius:10px; padding:12px;" class="form-grid">
+          <div style="font-size:11px; font-weight:600; color:var(--primary); text-transform:uppercase; letter-spacing:0.05em;">Owner Controls & Commission Override</div>
+          <div class="form-grid two-col">
+            <div class="form-field">
+              <label>Unit Cost / Capital</label>
+              <input type="number" id="saleBuyPriceInput" class="input-control" step="0.01" min="0" placeholder="Auto from product">
+            </div>
+            <div class="form-field">
+              <label>Unit Commission (leave blank = auto)</label>
+              <input type="number" id="saleCustomCommissionInput" class="input-control" step="0.01" min="0" placeholder="Auto-calculated">
+            </div>
+          </div>
+          <div class="form-grid two-col">
+            <div class="form-field">
+              <label>Sale Date</label>
+              <input type="date" id="saleDateInput" class="input-control">
+            </div>
+            <div class="form-field">
+              <label>Assign Sale To</label>
+              <select id="saleAssignedUserSelect" class="select-control"></select>
+            </div>
           </div>
         </div>
 
@@ -1637,17 +1695,18 @@
             <div class="metric-mini-val" id="productPrice">₱0.00</div>
           </div>
           <div>
-            <div class="metric-mini-label">Margin</div>
-            <div class="metric-mini-val" id="productMargin">0%</div>
+            <div class="metric-mini-label">Unit Profit</div>
+            <div class="metric-mini-val" style="color:var(--success);" id="productMargin">₱0.00</div>
           </div>
           <div>
-            <div class="metric-mini-label">Your Earn / Unit</div>
+            <div class="metric-mini-label">Salary / Unit</div>
             <div class="metric-mini-val" id="productCommission">₱0.00</div>
           </div>
         </div>
         <div id="totalEarningsCard" style="display:none; font-size:12px; color:var(--muted-foreground); margin-top:-6px;">
           Total Sale: <strong id="totalPrice" style="color:var(--foreground);">₱0.00</strong> •
-          Total Earnings: <strong id="totalEarnings" style="color:var(--primary);">₱0.00</strong>
+          Total Profit: <strong id="totalProfitPreview" style="color:var(--success);">₱0.00</strong> •
+          Salary (<span id="previewRateLabel">25%</span>): <strong id="totalEarnings" style="color:var(--primary);">₱0.00</strong>
         </div>
 
         <div class="form-grid two-col">
@@ -1791,12 +1850,26 @@
         </div>
         <div class="form-grid two-col">
           <div class="form-field">
-            <label>Buy Price / Capital (₱)</label>
+            <label>Buy Price / Capital</label>
             <input type="number" id="newBuyPrice" class="input-control" step="0.01" min="0" required>
           </div>
           <div class="form-field">
-            <label>Sell Price (₱)</label>
+            <label>Sell Price</label>
             <input type="number" id="newSellPrice" class="input-control" step="0.01" min="0" required>
+          </div>
+        </div>
+        <div class="form-grid two-col">
+          <div class="form-field">
+            <label>Product Commission Rule</label>
+            <select id="newProductCommType" class="select-control">
+              <option value="default">Default (Bracket / Admin Rule)</option>
+              <option value="fixed">Fixed Amount (per unit)</option>
+              <option value="percent">Custom Rate (% of sell)</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Custom Commission Value</label>
+            <input type="number" id="newProductCommValue" class="input-control" step="0.01" min="0" placeholder="Optional">
           </div>
         </div>
         <button type="submit" class="btn btn-primary">Save Product</button>
@@ -1808,7 +1881,7 @@
   <div id="editProductModal" class="modal">
     <div class="modal-dialog">
       <div class="modal-header">
-        <h3 class="modal-title">Edit Product</h3>
+        <h3 class="modal-title">Edit Product & Commission</h3>
         <button type="button" class="modal-close-btn" onclick="closeEditProductModal()">✕</button>
       </div>
       <form id="editProductForm" onsubmit="saveProductEdit(event)" class="form-grid">
@@ -1823,12 +1896,26 @@
         </div>
         <div class="form-grid two-col">
           <div class="form-field">
-            <label>Buy Price (₱)</label>
+            <label>Buy Price / Capital</label>
             <input type="number" id="editProductBuyPrice" class="input-control" step="0.01" min="0" required>
           </div>
           <div class="form-field">
-            <label>Sell Price (₱)</label>
+            <label>Sell Price</label>
             <input type="number" id="editProductSellPrice" class="input-control" step="0.01" min="0" required>
+          </div>
+        </div>
+        <div class="form-grid two-col">
+          <div class="form-field">
+            <label>Product Commission Rule</label>
+            <select id="editProductCommType" class="select-control">
+              <option value="default">Default (Bracket / Admin Rule)</option>
+              <option value="fixed">Fixed Amount (per unit)</option>
+              <option value="percent">Custom Rate (% of sell)</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Custom Commission Value</label>
+            <input type="number" id="editProductCommValue" class="input-control" step="0.01" min="0" placeholder="0">
           </div>
         </div>
         <div class="form-field">
@@ -1858,21 +1945,21 @@
         </div>
         <div class="form-grid two-col">
           <div class="form-field">
-            <label>Buy Cost (₱)</label>
+            <label>Buy Cost</label>
             <input type="number" id="subBuyPrice" class="input-control" step="0.01" min="0" required>
           </div>
           <div class="form-field">
-            <label>Full Account Price (₱)</label>
+            <label>Full Account Price</label>
             <input type="number" id="subFullPrice" class="input-control" step="0.01" min="0" required>
           </div>
         </div>
         <div class="form-grid two-col">
           <div class="form-field">
-            <label>Solo Profile Price (₱)</label>
+            <label>Solo Profile Price</label>
             <input type="number" id="subSoloPrice" class="input-control" step="0.01" min="0" required>
           </div>
           <div class="form-field">
-            <label>Shared Profile Price (₱)</label>
+            <label>Shared Profile Price</label>
             <input type="number" id="subSharedPrice" class="input-control" step="0.01" min="0" required>
           </div>
         </div>
@@ -1900,41 +1987,42 @@
         </div>
         <div class="form-grid two-col">
           <div class="form-field">
-            <label>Buy Cost (₱)</label>
+            <label>Buy Cost</label>
             <input type="number" id="editSubBuyPrice" class="input-control" step="0.01" min="0" required>
           </div>
           <div class="form-field">
-            <label>Full Account Price (₱)</label>
+            <label>Full Account Price</label>
             <input type="number" id="editSubFullPrice" class="input-control" step="0.01" min="0" required>
           </div>
         </div>
         <div class="form-grid two-col">
           <div class="form-field">
-            <label>Solo Price (₱)</label>
+            <label>Solo Price</label>
             <input type="number" id="editSubSoloPrice" class="input-control" step="0.01" min="0" required>
           </div>
           <div class="form-field">
-            <label>Shared Price (₱)</label>
+            <label>Shared Price</label>
             <input type="number" id="editSubSharedPrice" class="input-control" step="0.01" min="0" required>
           </div>
         </div>
         <div class="form-field">
           <label>Total Profiles</label>
-          <input type="number" id="editSubTotalProfiles" class="input-control" readonly>
+          <input type="number" id="editSubTotalProfiles" class="input-control" min="1" max="20" required>
         </div>
         <button type="submit" class="btn btn-primary">Save Changes</button>
       </form>
     </div>
   </div>
 
-  <!-- Create Streaming Account Modal -->
+  <!-- Create / Edit Streaming Account Modal -->
   <div id="accountManagementModal" class="modal">
     <div class="modal-dialog">
       <div class="modal-header">
-        <h3 class="modal-title">Add Streaming Account</h3>
+        <h3 class="modal-title" id="accountModalTitle">Add Streaming Account</h3>
         <button type="button" class="modal-close-btn" onclick="closeAccountManagementModal()">✕</button>
       </div>
       <form id="createAccountForm" onsubmit="saveAccount(event)" class="form-grid">
+        <input type="hidden" id="editingAccountOriginalKey">
         <div class="form-field">
           <label>Account ID / Label</label>
           <input type="text" id="accountIdInput" class="input-control" placeholder="e.g. NF-001 or email" required>
@@ -1976,31 +2064,32 @@
             </div>
           </div>
         </div>
-        <button type="submit" class="btn btn-primary">Create Account</button>
+        <button type="submit" id="accountModalSubmitBtn" class="btn btn-primary">Save Account</button>
       </form>
     </div>
   </div>
 
-  <!-- Add Commission Bracket Modal -->
+  <!-- Add / Edit Commission Bracket Modal -->
   <div id="commissionBracketModal" class="modal">
     <div class="modal-dialog">
       <div class="modal-header">
-        <h3 class="modal-title">Add Commission Bracket</h3>
+        <h3 class="modal-title" id="bracketModalTitle">Add Commission Bracket</h3>
         <button type="button" class="modal-close-btn" onclick="closeCommissionBracketModal()">✕</button>
       </div>
       <form id="addBracketForm" class="form-grid">
+        <input type="hidden" id="editingBracketId">
         <div class="form-grid two-col">
           <div class="form-field">
-            <label>Min Sale Price (₱)</label>
+            <label>Min Sales (₱)</label>
             <input type="number" id="bracketMinProfit" class="input-control" step="0.01" min="0" required>
           </div>
           <div class="form-field">
-            <label>Max Sale Price (₱, optional)</label>
-            <input type="number" id="bracketMaxProfit" class="input-control" step="0.01" min="0" placeholder="Leave blank for & above">
+            <label>Max Sales (₱, optional)</label>
+            <input type="number" id="bracketMaxProfit" class="input-control" step="0.01" min="0" placeholder="Leave blank for & up">
           </div>
         </div>
         <div class="form-field">
-          <label>Commission Rate (%)</label>
+          <label>Salary Rate (% of Profit)</label>
           <input type="number" id="bracketRate" class="input-control" step="0.1" min="0" max="100" required>
         </div>
         <button type="submit" class="btn btn-primary">Save Bracket</button>
@@ -2012,66 +2101,94 @@
   <div id="userModal" class="modal">
     <div class="modal-dialog">
       <div class="modal-header">
-        <h3 class="modal-title">Add Admin Profile</h3>
+        <h3 class="modal-title">Add Team Profile</h3>
         <button type="button" class="modal-close-btn" onclick="closeUserModal()">✕</button>
       </div>
       <form id="addUserForm" class="form-grid">
-        <div class="form-field">
-          <label>Display Name</label>
-          <input type="text" id="newUserName" class="input-control" placeholder="e.g. Sophia" required>
+        <div class="form-grid two-col">
+          <div class="form-field">
+            <label>Display Name</label>
+            <input type="text" id="newUserName" class="input-control" placeholder="e.g. Sophia" required>
+          </div>
+          <div class="form-field">
+            <label>Username</label>
+            <input type="text" id="newUsername" class="input-control" placeholder="e.g. sophia" required>
+          </div>
         </div>
-        <div class="form-field">
-          <label>Username</label>
-          <input type="text" id="newUsername" class="input-control" placeholder="e.g. sophia" required>
-        </div>
-        <div class="form-field">
-          <label>PIN / Password</label>
-          <input type="password" id="newPassword" class="input-control" placeholder="Enter PIN or password" required>
+        <div class="form-grid two-col">
+          <div class="form-field">
+            <label>PIN / Password</label>
+            <input type="password" id="newPassword" class="input-control" placeholder="Enter PIN or password" required>
+          </div>
+          <div class="form-field">
+            <label>Role</label>
+            <select id="newUserRole" class="select-control">
+              <option value="admin">Admin</option>
+              <option value="owner">Owner</option>
+            </select>
+          </div>
         </div>
         <div class="form-field">
           <label>Commission Mode</label>
-          <div class="radio-pill-group">
-            <label class="radio-pill"><input type="radio" name="commissionMode" value="bracket" checked> Bracket-Based</label>
-            <label class="radio-pill"><input type="radio" name="commissionMode" value="flatRate"> Flat Rate %</label>
-          </div>
+          <select id="newUserCommMode" class="select-control" onchange="toggleNewUserCommFields()">
+            <option value="bracket">Bracket-Based (Global Salary Rules)</option>
+            <option value="flatRate">Flat Rate (% of Sale Price)</option>
+            <option value="profitShare">Profit Share (% of Net Profit)</option>
+            <option value="fixedPerSale">Fixed Amount (per Unit Sold)</option>
+          </select>
         </div>
         <div class="form-field" id="flatRateSection" style="display:none;">
-          <label>Flat Commission Rate (%)</label>
-          <input type="number" id="newProfitPercent" class="input-control" value="20" min="0" max="100" step="0.5">
+          <label id="newUserCommValueLabel">Commission Value</label>
+          <input type="number" id="newProfitPercent" class="input-control" value="20" min="0" step="0.5">
         </div>
-        <button type="submit" class="btn btn-primary">Create Admin</button>
+        <button type="submit" class="btn btn-primary">Create Profile</button>
       </form>
     </div>
   </div>
 
-  <!-- Edit User Commission Modal -->
+  <!-- Edit User & Commission Modal -->
   <div id="editCommissionModal" class="modal">
     <div class="modal-dialog">
       <div class="modal-header">
-        <h3 class="modal-title">Edit Admin Commission</h3>
+        <h3 class="modal-title">Edit User & Commission</h3>
         <button type="button" class="modal-close-btn" onclick="closeEditCommissionModal()">✕</button>
       </div>
       <form id="editCommissionForm" class="form-grid">
         <input type="hidden" id="editUserId">
+        <div class="form-grid two-col">
+          <div class="form-field">
+            <label>Display Name</label>
+            <input type="text" id="editUserName" class="input-control" required>
+          </div>
+          <div class="form-field">
+            <label>Role</label>
+            <select id="editUserRole" class="select-control">
+              <option value="admin">Admin</option>
+              <option value="owner">Owner</option>
+            </select>
+          </div>
+        </div>
         <div class="form-field">
-          <label>Admin</label>
-          <input type="text" id="editUserName" class="input-control" readonly>
+          <label>Reset PIN / Password (leave blank to keep current)</label>
+          <input type="text" id="editUserPassword" class="input-control" placeholder="Enter new PIN or password">
         </div>
         <div class="form-field">
           <label>Commission Mode</label>
-          <div class="radio-pill-group">
-            <label class="radio-pill"><input type="radio" name="editCommissionMode" id="editCommissionBracket" value="bracket"> Bracket-Based</label>
-            <label class="radio-pill"><input type="radio" name="editCommissionMode" id="editCommissionFlatRate" value="flatRate"> Flat Rate %</label>
-          </div>
+          <select id="editUserCommModeSelect" class="select-control" onchange="toggleEditUserCommFields()">
+            <option value="bracket">Bracket-Based (Global Salary Rules)</option>
+            <option value="flatRate">Flat Rate (% of Sale Price)</option>
+            <option value="profitShare">Profit Share (% of Net Profit)</option>
+            <option value="fixedPerSale">Fixed Amount (per Unit Sold)</option>
+          </select>
         </div>
         <div class="form-field" id="editFlatRateSection">
-          <label>Flat Commission Rate (%)</label>
-          <input type="number" id="editProfitPercent" class="input-control" value="20" min="0" max="100" step="0.5">
+          <label id="editUserCommValueLabel">Commission Rate (%) / Amount</label>
+          <input type="number" id="editProfitPercent" class="input-control" value="20" min="0" step="0.5">
         </div>
         <div id="editBracketInfoSection" style="display:none; font-size:12px; color:var(--muted-foreground);">
           Uses the global Salary Rules commission brackets.
         </div>
-        <button type="submit" class="btn btn-primary">Save Settings</button>
+        <button type="submit" class="btn btn-primary">Save User & Rules</button>
       </form>
     </div>
   </div>
@@ -2087,8 +2204,8 @@
         <input type="hidden" id="payoutToMarkId">
         <input type="hidden" id="payoutToMarkUserId">
         <div class="form-field">
-          <label>Amount (₱)</label>
-          <input type="number" id="payoutToMarkAmount" class="input-control" step="0.01" readonly>
+          <label>Payout Amount (Editable for Bonus / Partial)</label>
+          <input type="number" id="payoutToMarkAmount" class="input-control" step="0.01" min="0" required>
         </div>
         <div class="form-field">
           <label>Payment Method</label>
@@ -2276,11 +2393,6 @@
       setTimeout(() => toast.classList.remove('show'), 2800);
     }
 
-    function formatCurrency(val) {
-      const num = Number(val) || 0;
-      return '₱' + num.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    }
-
     // =================== STATE ===================
     let currentSession = null;
     let currentUsername = '';
@@ -2296,6 +2408,28 @@
     let currentPayoutPeriod = 'all';
     const OWNER_SETTINGS_KEY = 'owner';
     let settings = { theme: 'dark', avatar: '' };
+    let shopConfig = { shopName: 'Ryde', currency: '₱', defaultRate: 20 };
+
+    function formatCurrency(val) {
+      const num = Number(val) || 0;
+      const sym = (shopConfig && shopConfig.currency) ? shopConfig.currency : '₱';
+      return sym + num.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function applyShopConfig() {
+      const name = (shopConfig && shopConfig.shopName) ? shopConfig.shopName : 'Ryde';
+      document.title = `${name} — Sales Tracker`;
+      const brandEl = document.querySelector('.brand-script');
+      if (brandEl) brandEl.textContent = name;
+      const mobileBrandEl = document.querySelector('.mobile-brand-text');
+      if (mobileBrandEl) mobileBrandEl.textContent = name;
+      const shopNameInput = document.getElementById('settingsShopName');
+      if (shopNameInput) shopNameInput.value = name;
+      const currInput = document.getElementById('settingsCurrencySymbol');
+      if (currInput) currInput.value = shopConfig.currency || '₱';
+      const defRateInput = document.getElementById('settingsDefaultRate');
+      if (defRateInput) defRateInput.value = shopConfig.defaultRate ?? 20;
+    }
 
     const isOwner = (user = currentSession) => (user && (user.role || '').toLowerCase() === 'owner');
     const isAdmin = (user = currentSession) => (user && (user.role || '').toLowerCase() === 'admin');
@@ -2391,6 +2525,8 @@
         document.getElementById('userFilter').style.display = 'inline-block';
         document.getElementById('ownerBracketActions').style.display = 'flex';
         document.getElementById('ownerProductActions').style.display = 'flex';
+        document.getElementById('ownerShopSettingsCard').style.display = 'block';
+        document.getElementById('ownerSaleOverrides').style.display = 'grid';
       } else {
         document.getElementById('navLabelDashboard').textContent = 'My Dashboard';
         document.getElementById('navLabelSales').textContent = 'My Sales';
@@ -2404,6 +2540,8 @@
         document.getElementById('adminColumn').style.display = 'none';
         document.getElementById('ownerBracketActions').style.display = 'none';
         document.getElementById('ownerProductActions').style.display = 'none';
+        document.getElementById('ownerShopSettingsCard').style.display = 'none';
+        document.getElementById('ownerSaleOverrides').style.display = 'none';
         document.querySelectorAll('.owner-col').forEach(el => el.style.display = 'none');
       }
 
@@ -2413,6 +2551,18 @@
 
     // =================== LOAD DATA FROM FIREBASE ===================
     function loadAllData() {
+      // Shop config listener
+      getRef('settings/' + OWNER_SETTINGS_KEY + '/shopConfig').on('value', (snap) => {
+        if (snap.exists()) {
+          shopConfig = { ...shopConfig, ...(snap.val() || {}) };
+        }
+        applyShopConfig();
+        updateUI();
+        renderProductList();
+        renderSubscriptionProducts();
+        renderCommissionBrackets();
+      });
+
       loadCommissionBrackets();
 
       // Users listener
@@ -2429,18 +2579,17 @@
         if (me) {
           currentSession.id = me.id;
           currentSession.commissionMode = me.commissionMode || 'bracket';
-          currentSession.profitPercent = me.profitPercent || 20;
+          currentSession.profitPercent = me.profitPercent ?? 20;
         }
 
         if (isOwner()) {
           const userFilter = document.getElementById('userFilter');
           const currentVal = userFilter.value || 'all';
-          userFilter.innerHTML = '<option value="all">All Admins</option>';
+          userFilter.innerHTML = '<option value="all">All Users</option>';
           users.forEach(user => {
-            if ((user.role || '').toLowerCase() === 'admin') {
-              const name = (user.customName || user.username).replace(/^@/, '');
-              userFilter.innerHTML += `<option value="${user.id}">${name}</option>`;
-            }
+            const name = (user.customName || user.username).replace(/^@/, '');
+            const rTag = (user.role || '').toLowerCase() === 'owner' ? ' (Owner)' : '';
+            userFilter.innerHTML += `<option value="${user.id}">${name}${rTag}</option>`;
           });
           userFilter.value = currentVal;
           renderUserList();
@@ -2466,6 +2615,8 @@
             margin,
             category: p.category || 'General',
             accountTypes: p.accountTypes || [],
+            commType: p.commType || 'default',
+            commValue: Number(p.commValue) || 0,
             customCommissions: p.customCommissions || {}
           });
         });
@@ -2695,7 +2846,8 @@
         const price = parseFloat(s.price) || 0;
         const buy = parseFloat(s.buyPrice) || 0;
         const rev = price * qty;
-        const comm = (parseFloat(s.commission) || 0) * qty;
+        const unitComm = getEffectiveSaleUnitCommission(s, filtered);
+        const comm = unitComm * qty;
 
         submittedSales += rev;
         totalQty += qty;
@@ -2706,7 +2858,9 @@
           officialCount += 1;
           totalCapital += buy * qty;
           totalProfit += (price - buy) * qty;
-          totalSalary += comm;
+          if ((s.userRole || '').toLowerCase() !== 'owner') {
+            totalSalary += comm;
+          }
         } else {
           pendingCount += 1;
         }
@@ -2742,10 +2896,12 @@
         }
       });
 
+      const myRate = !isOwner() ? getCommissionRateForProfit(officialSales, currentSession?.id) : 100;
+
       const cards = isOwner()
         ? [
             { label: 'Official Sales', value: formatCurrency(officialSales), sub: `${officialCount} verified`, icon: ICONS.check },
-            { label: 'Official Profit', value: formatCurrency(totalProfit), sub: 'Gross profit', icon: ICONS.trend },
+            { label: 'Official Profit', value: formatCurrency(totalProfit), sub: 'Sales – Capital', icon: ICONS.trend },
             { label: 'Owner Earnings', value: formatCurrency(ownerEarnings), sub: 'Net after salary', icon: ICONS.dollar },
             { label: 'Admin Salary', value: formatCurrency(totalSalary), sub: `${users.filter(u => u.role === 'admin').length} admins`, icon: ICONS.users },
             { label: 'Total Capital', value: formatCurrency(totalCapital), sub: 'Product cost', icon: ICONS.box },
@@ -2759,8 +2915,8 @@
           ]
         : [
             { label: 'My Sales', value: formatCurrency(submittedSales), sub: `${filtered.length} entries`, icon: ICONS.cart },
-            { label: 'Verified Sales', value: formatCurrency(officialSales), sub: `${officialCount} verified`, icon: ICONS.check },
-            { label: 'My Salary', value: formatCurrency(totalSalary), sub: `Est: ${formatCurrency(totalSalary)}`, icon: ICONS.dollar },
+            { label: 'Verified Sales', value: formatCurrency(officialSales), sub: `Profit: ${formatCurrency(totalProfit)}`, icon: ICONS.check },
+            { label: 'My Salary', value: formatCurrency(totalSalary), sub: `${myRate}% of ${formatCurrency(totalProfit)} profit`, icon: ICONS.dollar },
             { label: 'Qty Sold', value: String(totalQty), sub: `${filtered.length} orders`, icon: ICONS.chart },
             { label: 'Pending', value: String(pendingCount), sub: '0 rejected', icon: ICONS.clock },
             { label: 'Avg Sale Value', value: formatCurrency(avgSaleValue), sub: 'Per order', icon: ICONS.target },
@@ -2787,21 +2943,25 @@
             ${ICONS.dollar}
             <p class="stat-label">Total Earned Salary</p>
             <p class="stat-value">${formatCurrency(totalSalary)}</p>
+            <p class="stat-sub">Profit × Rate%</p>
           </div>
           <div class="stat-card">
             ${ICONS.check}
             <p class="stat-label">Verified Sales</p>
             <p class="stat-value">${formatCurrency(officialSales)}</p>
+            <p class="stat-sub">Capital: ${formatCurrency(totalCapital)}</p>
           </div>
           <div class="stat-card">
-            ${ICONS.chart}
-            <p class="stat-label">Items Sold</p>
-            <p class="stat-value">${totalQty}</p>
+            ${ICONS.trend}
+            <p class="stat-label">Net Profit</p>
+            <p class="stat-value">${formatCurrency(totalProfit)}</p>
+            <p class="stat-sub">Sales – Capital</p>
           </div>
           <div class="stat-card">
             ${ICONS.clock}
             <p class="stat-label">Pending Payouts</p>
             <p class="stat-value">${payouts.filter(p => p.status === 'pending').length}</p>
+            <p class="stat-sub">${totalQty} items sold</p>
           </div>
         `;
       }
@@ -2851,18 +3011,20 @@
           const price = parseFloat(s.price) || 0;
           const buy = parseFloat(s.buyPrice) || 0;
           acc.sales += price * qty;
+          acc.capital += buy * qty;
           acc.profit += (price - buy) * qty;
-          acc.salary += (parseFloat(s.commission) || 0) * qty;
+          acc.salary += getEffectiveSaleUnitCommission(s, periodSales) * qty;
           acc.items += qty;
           return acc;
-        }, { sales: 0, profit: 0, salary: 0, items: 0 });
+        }, { sales: 0, capital: 0, profit: 0, salary: 0, items: 0 });
+        const tierRate = getCommissionRateForProfit(totals.sales, user.id);
         const name = (user.customName || user.username).replace(/^@/, '');
         return `
           <div class="item-card">
             <div class="item-card-header">
               <div>
                 <div class="item-card-title">${name}</div>
-                <div class="item-card-sub">@${user.username.replace(/^@/, '')}</div>
+                <div class="item-card-sub">@${user.username.replace(/^@/, '')} • ${tierRate}% rate</div>
               </div>
               <span class="badge badge-primary">${totals.items} sold</span>
             </div>
@@ -2872,7 +3034,11 @@
                 <div class="metric-mini-val">${formatCurrency(totals.sales)}</div>
               </div>
               <div>
-                <div class="metric-mini-label">Salary</div>
+                <div class="metric-mini-label">Profit</div>
+                <div class="metric-mini-val" style="color:var(--success);">${formatCurrency(totals.profit)}</div>
+              </div>
+              <div>
+                <div class="metric-mini-label">Salary (${tierRate}%)</div>
                 <div class="metric-mini-val" style="color:var(--primary);">${formatCurrency(totals.salary)}</div>
               </div>
             </div>
@@ -2962,6 +3128,78 @@
       refreshPayoutViews();
     }
 
+    // =================== UNIFIED COMMISSION ENGINE ===================
+    // Formula:
+    //   25% = 1 to 500 sales
+    //   30% = 501 to 999 sales
+    //   35% = 1000 to 1599 sales
+    //   40% = 1600 and up sales
+    //   sales - capital = profit
+    //   profit * rate% = salary
+    function getUserTotalVerifiedSales(targetUser, contextSales = sales) {
+      if (!targetUser) return 0;
+      const uKey = sanitizeUserKey(targetUser.username || targetUser.userKey || '');
+      const uId = targetUser.id || targetUser.userId;
+      return (contextSales || []).reduce((sum, s) => {
+        if (!s.sold) return sum;
+        const match = (uId && String(s.userId) === String(uId)) || (uKey && s.userKey === uKey);
+        if (!match) return sum;
+        return sum + ((parseFloat(s.price) || 0) * (parseInt(s.quantity) || 1));
+      }, 0);
+    }
+
+    function calculateUnitCommission(product, sellPrice, buyPrice, targetUser = currentSession, projectedSalesTotal = null) {
+      const price = Number(sellPrice) || 0;
+      const cost = Number(buyPrice) || 0;
+      const unitProfit = Math.max(price - cost, 0); // sales - capital = profit
+      const user = targetUser || currentSession;
+
+      if (user && (user.role || '').toLowerCase() === 'owner') {
+        return price - cost;
+      }
+
+      if (product) {
+        if (product.commType === 'fixed' && Number(product.commValue) > 0) {
+          return Number(product.commValue);
+        }
+        if (product.commType === 'percent' && Number(product.commValue) > 0) {
+          return (unitProfit * Number(product.commValue)) / 100;
+        }
+      }
+
+      if (user) {
+        const mode = user.commissionMode || 'bracket';
+        const val = Number(user.profitPercent) || 0;
+        if (mode === 'flatRate') {
+          return (price * (val || 25)) / 100;
+        }
+        if (mode === 'profitShare') {
+          return (unitProfit * (val || 25)) / 100;
+        }
+        if (mode === 'fixedPerSale') {
+          return val;
+        }
+      }
+
+      const salesBasis = projectedSalesTotal !== null
+        ? projectedSalesTotal
+        : Math.max(getUserTotalVerifiedSales(user) || price, price);
+      const rate = getCommissionRateForProfit(salesBasis, user ? user.id : null);
+      return (unitProfit * rate) / 100;
+    }
+
+    function getEffectiveSaleUnitCommission(sale, contextSales = sales) {
+      if (!sale) return 0;
+      if (sale.customCommission !== undefined && sale.customCommission !== null && sale.customCommission !== '') {
+        return Number(sale.customCommission) || 0;
+      }
+      const u = users.find(x => String(x.id) === String(sale.userId) || sanitizeUserKey(x.username) === sale.userKey)
+        || { id: sale.userId, username: sale.soldBy, userKey: sale.userKey, role: sale.userRole || 'admin', commissionMode: 'bracket' };
+      const prod = findProductById(sale.productId);
+      const userSalesTotal = Math.max(getUserTotalVerifiedSales(u, contextSales), (Number(sale.price) || 0) * (parseInt(sale.quantity) || 1));
+      return calculateUnitCommission(prod, sale.price, sale.buyPrice, u, userSalesTotal);
+    }
+
     // =================== SALES LOG TABLE & MODAL ===================
     function renderSalesTable() {
       const tbody = document.getElementById('salesTableBody');
@@ -3000,7 +3238,7 @@
       tableWrap.style.display = 'block';
 
       tbody.innerHTML = filtered.map(sale => {
-        const commTotal = (Number(sale.commission) || 0) * (parseInt(sale.quantity) || 1);
+        const commTotal = getEffectiveSaleUnitCommission(sale, filtered) * (parseInt(sale.quantity) || 1);
         return `
           <tr>
             <td>${sale.date || '-'}</td>
@@ -3014,9 +3252,11 @@
             <td style="font-weight:600;">${formatCurrency(sale.totalPrice)}</td>
             <td style="color:var(--primary); font-weight:500;">${formatCurrency(commTotal)}</td>
             <td>
-              <span class="badge ${sale.sold ? 'badge-verified' : 'badge-pending'}">
-                ${sale.sold ? 'Verified' : 'Pending'}
-              </span>
+              <button type="button" onclick="toggleSaleStatus('${sale.id}')" style="background:none; border:none; padding:0; cursor:pointer;" title="Click to toggle status">
+                <span class="badge ${sale.sold ? 'badge-verified' : 'badge-pending'}">
+                  ${sale.sold ? 'Verified' : 'Pending'}
+                </span>
+              </button>
             </td>
             <td>
               <div style="display:flex; gap:6px;">
@@ -3029,6 +3269,18 @@
       }).join('');
     }
 
+    function toggleSaleStatus(saleId) {
+      const sale = sales.find(s => String(s.id) === String(saleId));
+      if (!sale) return;
+      const userKey = sale.userKey || sanitizeUserKey(sale.soldBy || currentSession.username);
+      const nextSold = !sale.sold;
+      showSyncingIndicator();
+      getRef(`sales/${userKey}/${saleId}`).update({ sold: nextSold }).then(() => {
+        showToast(`Marked as ${nextSold ? 'Verified / Sold' : 'Pending'}`);
+        autoCalculatePayouts();
+      });
+    }
+
     function openAddSaleModal() {
       editingSale = null;
       document.getElementById('saleModalTitle').textContent = 'Add Sale';
@@ -3036,6 +3288,18 @@
       document.getElementById('productDetailsCard').style.display = 'none';
       document.getElementById('totalEarningsCard').style.display = 'none';
       document.getElementById('profileTrackingFields').style.display = 'none';
+      if (document.getElementById('saleDateInput')) {
+        document.getElementById('saleDateInput').value = new Date().toISOString().split('T')[0];
+      }
+      if (document.getElementById('saleBuyPriceInput')) {
+        document.getElementById('saleBuyPriceInput').value = '';
+      }
+      if (document.getElementById('saleCustomCommissionInput')) {
+        document.getElementById('saleCustomCommissionInput').value = '';
+      }
+      if (document.getElementById('saleAssignedUserSelect') && currentSession) {
+        document.getElementById('saleAssignedUserSelect').value = currentSession.username;
+      }
       const submitBtn = document.querySelector('#addSaleForm button[type="submit"]');
       if (submitBtn) submitBtn.textContent = '+ Add Sale';
       document.getElementById('saleModal').classList.add('show');
@@ -3068,7 +3332,7 @@
         categories[cat].forEach(p => {
           const opt = document.createElement('option');
           opt.value = p.id;
-          opt.textContent = `${p.name} — ₱${Number(p.sellPrice).toFixed(2)}`;
+          opt.textContent = `${p.name} — ${formatCurrency(p.sellPrice)}`;
           group.appendChild(opt);
         });
         select.appendChild(group);
@@ -3080,7 +3344,7 @@
         subscriptionProducts.forEach(sp => {
           const opt = document.createElement('option');
           opt.value = sp.id;
-          opt.textContent = `${sp.name} — ₱${Number(sp.soloPrice || sp.fullPrice).toFixed(2)}`;
+          opt.textContent = `${sp.name} — ${formatCurrency(sp.soloPrice || sp.fullPrice)}`;
           subGroup.appendChild(opt);
         });
         select.appendChild(subGroup);
@@ -3093,17 +3357,32 @@
       if (product) {
         const defaultPrice = product.sellPrice ?? product.soloPrice ?? product.fullPrice ?? 0;
         document.getElementById('productPriceInput').value = Number(defaultPrice).toFixed(2);
+        if (document.getElementById('saleBuyPriceInput')) {
+          document.getElementById('saleBuyPriceInput').value = Number(product.buyPrice || 0).toFixed(2);
+        }
       }
       displayProductDetails(productId);
       handleProductChangeForProfileTracking(productId);
     });
 
-    document.getElementById('productQuantity').addEventListener('input', () => {
-      displayProductDetails(document.getElementById('productSelect').value);
+    ['productQuantity', 'productPriceInput', 'saleBuyPriceInput', 'saleCustomCommissionInput', 'saleAssignedUserSelect'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('input', () => displayProductDetails(document.getElementById('productSelect').value));
+        el.addEventListener('change', () => displayProductDetails(document.getElementById('productSelect').value));
+      }
     });
-    document.getElementById('productPriceInput').addEventListener('input', () => {
-      displayProductDetails(document.getElementById('productSelect').value);
-    });
+
+    function getSelectedSaleTargetUser() {
+      if (isOwner()) {
+        const assignedUsername = document.getElementById('saleAssignedUserSelect')?.value;
+        if (assignedUsername) {
+          const found = users.find(u => u.username === assignedUsername || sanitizeUserKey(u.username) === sanitizeUserKey(assignedUsername));
+          if (found) return found;
+        }
+      }
+      return currentSession;
+    }
 
     function displayProductDetails(productId) {
       if (!productId) {
@@ -3116,19 +3395,36 @@
 
       const qty = parseInt(document.getElementById('productQuantity').value) || 1;
       const priceInput = document.getElementById('productPriceInput');
-      const buyPrice = Number(product.buyPrice) || 0;
+      const buyInput = document.getElementById('saleBuyPriceInput');
+      const customCommInput = document.getElementById('saleCustomCommissionInput');
+
+      const buyPrice = (isOwner() && buyInput && buyInput.value !== '')
+        ? (parseFloat(buyInput.value) || 0)
+        : (Number(product.buyPrice) || 0);
       const baseSell = Number(product.sellPrice ?? product.soloPrice ?? product.fullPrice) || 0;
       const userPrice = priceInput && priceInput.value ? parseFloat(priceInput.value) : baseSell;
 
       const actualProfit = userPrice - buyPrice;
-      const margin = buyPrice > 0 ? (actualProfit / buyPrice) * 100 : 0;
-      const rate = isOwner() ? 100 : getCommissionRateForProfit(userPrice);
-      const unitEarn = isOwner() ? actualProfit : (userPrice * rate) / 100;
+      const targetUser = getSelectedSaleTargetUser();
+      const existingUserSales = getUserTotalVerifiedSales(targetUser);
+      const projectedTotalSales = existingUserSales + (userPrice * qty);
+      const activeRate = (targetUser && (targetUser.role || '').toLowerCase() === 'owner')
+        ? 100
+        : getCommissionRateForProfit(projectedTotalSales, targetUser ? targetUser.id : null);
+
+      let unitEarn = calculateUnitCommission(product, userPrice, buyPrice, targetUser, projectedTotalSales);
+      if (isOwner() && customCommInput && customCommInput.value !== '') {
+        unitEarn = parseFloat(customCommInput.value) || 0;
+      }
 
       document.getElementById('productPrice').textContent = formatCurrency(userPrice);
-      document.getElementById('productMargin').textContent = margin.toFixed(1) + '%';
-      document.getElementById('productCommission').textContent = `${formatCurrency(unitEarn)} (${rate}%)`;
+      document.getElementById('productMargin').textContent = formatCurrency(actualProfit);
+      document.getElementById('productCommission').textContent = formatCurrency(unitEarn);
       document.getElementById('totalPrice').textContent = formatCurrency(userPrice * qty);
+      const profitPreviewEl = document.getElementById('totalProfitPreview');
+      if (profitPreviewEl) profitPreviewEl.textContent = formatCurrency(actualProfit * qty);
+      const ratePreviewEl = document.getElementById('previewRateLabel');
+      if (ratePreviewEl) ratePreviewEl.textContent = `${activeRate}%`;
       document.getElementById('totalEarnings').textContent = formatCurrency(unitEarn * qty);
 
       document.getElementById('productDetailsCard').style.display = 'grid';
@@ -3173,17 +3469,22 @@
 
     function populateSoldByDropdown() {
       const sel = document.getElementById('soldBySelect');
-      if (!sel || !currentSession) return;
-      sel.innerHTML = `<option value="${currentSession.username}">${(currentSession.customName || currentSession.username).replace(/^@/, '')} (You)</option>`;
+      const assignSel = document.getElementById('saleAssignedUserSelect');
+      if (!currentSession) return;
+      const myLabel = `${(currentSession.customName || currentSession.username).replace(/^@/, '')} (You)`;
+      let html = `<option value="${currentSession.username}">${myLabel}</option>`;
       users.forEach(u => {
         if (u.username !== currentSession.username) {
-          sel.innerHTML += `<option value="${u.username}">${(u.customName || u.username).replace(/^@/, '')}</option>`;
+          const rTag = (u.role || '').toLowerCase() === 'owner' ? ' (Owner)' : ' (Admin)';
+          html += `<option value="${u.username}">${(u.customName || u.username).replace(/^@/, '')}${rTag}</option>`;
         }
       });
+      if (sel) sel.innerHTML = html;
+      if (assignSel) assignSel.innerHTML = html;
     }
 
     // Add / Save Sale Submit
-    document.getElementById('addSaleForm').addEventListener('submit', function(e) {
+    document.getElementById('addSaleForm').addEventListener('submit', async function(e) {
       e.preventDefault();
       const isEditing = !!editingSale;
       const productId = document.getElementById('productSelect').value;
@@ -3199,28 +3500,43 @@
       const accountType = document.querySelector('input[name="accountType"]:checked')?.value || 'Solo';
       const quantity = parseInt(document.getElementById('productQuantity').value) || 1;
       const price = parseFloat(document.getElementById('productPriceInput').value) || Number(product.sellPrice || 0);
-      const buyPrice = Number(product.buyPrice) || 0;
-      const actualProfit = price - buyPrice;
 
-      const userKey = isEditing && editingSale.userKey
-        ? editingSale.userKey
-        : sanitizeUserKey(currentSession.username);
+      const buyInput = document.getElementById('saleBuyPriceInput');
+      const buyPrice = (isOwner() && buyInput && buyInput.value !== '')
+        ? (parseFloat(buyInput.value) || 0)
+        : (Number(product.buyPrice) || 0);
 
-      const rate = isOwner() ? 100 : getCommissionRateForProfit(price);
-      const commissionAmount = isOwner() ? actualProfit : (price * rate) / 100;
+      const targetUser = getSelectedSaleTargetUser();
+      const targetUsername = targetUser ? targetUser.username : currentSession.username;
+      const targetUserKey = sanitizeUserKey(targetUsername);
+      const targetUserName = targetUser ? (targetUser.customName || targetUser.username).replace(/^@/, '') : (currentSession.customName || currentSession.username).replace(/^@/, '');
+      const targetUserId = targetUser ? targetUser.id : currentSession.id;
+      const targetUserRole = targetUser ? targetUser.role : currentSession.role;
+
+      const customCommInput = document.getElementById('saleCustomCommissionInput');
+      const projectedSales = getUserTotalVerifiedSales(targetUser) + (price * quantity);
+      let commissionAmount = calculateUnitCommission(product, price, buyPrice, targetUser, projectedSales);
+      let hasCustomCommission = false;
+      if (isOwner() && customCommInput && customCommInput.value !== '') {
+        commissionAmount = parseFloat(customCommInput.value) || 0;
+        hasCustomCommission = true;
+      }
 
       const timestamp = Date.now();
       const saleId = isEditing ? editingSale.id : timestamp;
       const accountId = document.getElementById('accountIdSelect').value || null;
       const profileNumber = document.getElementById('profileNumberSelect').value ? parseInt(document.getElementById('profileNumberSelect').value) : null;
+      const chosenDate = (isOwner() && document.getElementById('saleDateInput')?.value)
+        ? document.getElementById('saleDateInput').value
+        : (isEditing && editingSale.date ? editingSale.date : new Date().toISOString().split('T')[0]);
 
       const newSale = {
         id: saleId,
-        userId: isEditing ? editingSale.userId : currentSession.id,
-        userName: isEditing ? editingSale.userName : (currentSession.customName || currentSession.username).replace(/^@/, ''),
-        userRole: isEditing ? editingSale.userRole : currentSession.role,
-        userKey: userKey,
-        soldBy: currentSession.username,
+        userId: targetUserId,
+        userName: targetUserName,
+        userRole: targetUserRole,
+        userKey: targetUserKey,
+        soldBy: targetUsername,
         recordedBy: currentSession.username,
         productId: productId,
         productName: product.name,
@@ -3235,22 +3551,27 @@
         buyPrice: buyPrice,
         sellPrice: price,
         commission: commissionAmount,
+        customCommission: hasCustomCommission ? commissionAmount : null,
         totalPrice: price * quantity,
         totalCommission: commissionAmount * quantity,
         sold: document.getElementById('productSoldStatus').value === 'yes',
-        date: isEditing && editingSale.date ? editingSale.date : new Date().toISOString().split('T')[0],
+        date: chosenDate,
         timestamp: isEditing && editingSale.timestamp ? editingSale.timestamp : timestamp
       };
 
-      showSyncingIndicator();
-      getRef('sales/' + userKey + '/' + saleId).set(newSale)
-        .then(() => {
-          closeSaleModal();
-          editingSale = null;
-          showToast(isEditing ? 'Sale updated!' : 'Sale added!');
-          autoCalculatePayouts();
-        })
-        .catch(err => showToast(err.message, 'error'));
+      try {
+        showSyncingIndicator();
+        if (isEditing && editingSale.userKey && editingSale.userKey !== targetUserKey) {
+          await getRef('sales/' + editingSale.userKey + '/' + saleId).remove();
+        }
+        await getRef('sales/' + targetUserKey + '/' + saleId).set(newSale);
+        closeSaleModal();
+        editingSale = null;
+        showToast(isEditing ? 'Sale updated!' : 'Sale added!');
+        autoCalculatePayouts();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
     });
 
     function editSale(id) {
@@ -3264,6 +3585,25 @@
       document.getElementById('buyerUsernameInput').value = sale.buyerUsername || '';
       document.getElementById('accountEmailInput').value = sale.accountEmail || '';
       document.getElementById('productSoldStatus').value = sale.sold ? 'yes' : 'no';
+
+      if (isOwner()) {
+        if (document.getElementById('saleBuyPriceInput')) {
+          document.getElementById('saleBuyPriceInput').value = Number(sale.buyPrice ?? 0).toFixed(2);
+        }
+        if (document.getElementById('saleCustomCommissionInput')) {
+          document.getElementById('saleCustomCommissionInput').value =
+            (sale.customCommission !== undefined && sale.customCommission !== null)
+              ? Number(sale.customCommission).toFixed(2)
+              : '';
+        }
+        if (document.getElementById('saleDateInput')) {
+          document.getElementById('saleDateInput').value = sale.date || new Date().toISOString().split('T')[0];
+        }
+        if (document.getElementById('saleAssignedUserSelect')) {
+          const matchUser = users.find(u => String(u.id) === String(sale.userId) || sanitizeUserKey(u.username) === sale.userKey);
+          document.getElementById('saleAssignedUserSelect').value = matchUser ? matchUser.username : (sale.soldBy || currentSession.username);
+        }
+      }
 
       const wRadio = document.querySelector(`input[name="warranty"][value="${sale.warranty}"]`);
       if (wRadio) wRadio.checked = true;
@@ -3361,8 +3701,7 @@
         const buyPrice = parseFloat(row.querySelector('.bulk-buy').value) || 0;
         const price = parseFloat(row.querySelector('.bulk-sell').value) || 0;
         const qty = parseInt(row.querySelector('.bulk-qty').value) || 1;
-        const rate = isOwner() ? 100 : getCommissionRateForProfit(price);
-        const comm = isOwner() ? (price - buyPrice) : (price * rate) / 100;
+        const comm = calculateUnitCommission(product, price, buyPrice, currentSession);
         const saleId = Date.now() + saved;
         await getRef(`sales/${userKey}/${saleId}`).set({
           id: saleId,
@@ -3422,15 +3761,13 @@
       const category = document.getElementById('newProductCategory').value.trim() || 'General';
       const buyPrice = parseFloat(document.getElementById('newBuyPrice').value) || 0;
       const sellPrice = parseFloat(document.getElementById('newSellPrice').value) || 0;
-      if (sellPrice <= buyPrice) {
-        showToast('Sell price must be greater than buy price', 'error');
-        return;
-      }
+      const commType = document.getElementById('newProductCommType')?.value || 'default';
+      const commValue = parseFloat(document.getElementById('newProductCommValue')?.value) || 0;
       const id = Date.now();
       const margin = buyPrice > 0 ? ((sellPrice - buyPrice) / buyPrice) * 100 : 0;
       showSyncingIndicator();
       getRef('products/' + id).set({
-        id, name, category, buyPrice, sellPrice, margin,
+        id, name, category, buyPrice, sellPrice, margin, commType, commValue,
         createdDate: new Date().toISOString().split('T')[0]
       }).then(() => {
         this.reset();
@@ -3475,12 +3812,22 @@
         return;
       }
 
+      const mySalesTotal = !isOwner() ? Math.max(getUserTotalVerifiedSales(currentSession), 1) : 1;
+
       container.innerHTML = filtered.map(product => {
         const buy = Number(product.buyPrice) || 0;
         const sell = Number(product.sellPrice) || 0;
-        const profit = sell - buy;
-        const rate = getCommissionRateForProfit(sell);
-        const adminEarns = sell * (rate / 100);
+        const profit = Math.max(sell - buy, 0);
+        const rate = getCommissionRateForProfit(isOwner() ? sell : mySalesTotal, currentSession?.id);
+        let adminEarns = profit * (rate / 100);
+        let commLabel = `Salary (${rate}% of Profit)`;
+        if (product.commType === 'fixed' && product.commValue > 0) {
+          adminEarns = Number(product.commValue);
+          commLabel = `Fixed Salary`;
+        } else if (product.commType === 'percent' && product.commValue > 0) {
+          adminEarns = (profit * Number(product.commValue)) / 100;
+          commLabel = `Custom (${product.commValue}% of Profit)`;
+        }
         return `
           <div class="item-card">
             <div class="item-card-header">
@@ -3493,7 +3840,7 @@
                   <button class="btn btn-sm btn-outline" onclick="editProduct('${product.id}')">Edit</button>
                   <button class="btn btn-sm btn-danger" onclick="deleteProduct('${product.id}')">✕</button>
                 </div>
-              ` : `<span class="badge badge-primary">${rate}% Comm</span>`}
+              ` : `<span class="badge badge-primary">${formatCurrency(adminEarns)} Salary</span>`}
             </div>
             <div class="metrics-mini-grid">
               <div>
@@ -3501,16 +3848,16 @@
                 <div class="metric-mini-val">${formatCurrency(sell)}</div>
               </div>
               <div>
-                <div class="metric-mini-label">${isOwner() ? 'Cost / Capital' : 'You Earn'}</div>
-                <div class="metric-mini-val" style="color:var(--primary);">${formatCurrency(isOwner() ? buy : adminEarns)}</div>
+                <div class="metric-mini-label">Cost / Capital</div>
+                <div class="metric-mini-val">${formatCurrency(buy)}</div>
               </div>
               <div>
-                <div class="metric-mini-label">Unit Profit</div>
+                <div class="metric-mini-label">Profit (Sale–Cap)</div>
                 <div class="metric-mini-val" style="color:var(--success);">${formatCurrency(profit)}</div>
               </div>
               <div>
-                <div class="metric-mini-label">Admin Comm (${rate}%)</div>
-                <div class="metric-mini-val">${formatCurrency(adminEarns)}</div>
+                <div class="metric-mini-label">${commLabel}</div>
+                <div class="metric-mini-val" style="color:var(--primary);">${formatCurrency(adminEarns)}</div>
               </div>
             </div>
           </div>
@@ -3536,6 +3883,12 @@
       document.getElementById('editProductCategory').value = product.category || 'General';
       document.getElementById('editProductBuyPrice').value = product.buyPrice;
       document.getElementById('editProductSellPrice').value = product.sellPrice;
+      if (document.getElementById('editProductCommType')) {
+        document.getElementById('editProductCommType').value = product.commType || 'default';
+      }
+      if (document.getElementById('editProductCommValue')) {
+        document.getElementById('editProductCommValue').value = product.commValue || '';
+      }
       document.getElementById('editTypeSolo').checked = (product.accountTypes || []).includes('Solo');
       document.getElementById('editTypeShared').checked = (product.accountTypes || []).includes('Shared');
       document.getElementById('editTypePremium').checked = (product.accountTypes || []).includes('Premium');
@@ -3551,6 +3904,8 @@
       const category = document.getElementById('editProductCategory').value.trim();
       const buyPrice = parseFloat(document.getElementById('editProductBuyPrice').value) || 0;
       const sellPrice = parseFloat(document.getElementById('editProductSellPrice').value) || 0;
+      const commType = document.getElementById('editProductCommType')?.value || 'default';
+      const commValue = parseFloat(document.getElementById('editProductCommValue')?.value) || 0;
       const accountTypes = [];
       if (document.getElementById('editTypeSolo').checked) accountTypes.push('Solo');
       if (document.getElementById('editTypeShared').checked) accountTypes.push('Shared');
@@ -3559,7 +3914,7 @@
 
       showSyncingIndicator();
       getRef('products/' + id).update({
-        id, name, category, buyPrice, sellPrice, margin, accountTypes,
+        id, name, category, buyPrice, sellPrice, margin, accountTypes, commType, commValue,
         updatedDate: new Date().toISOString().split('T')[0]
       }).then(() => {
         closeEditProductModal();
@@ -3626,13 +3981,20 @@
       const id = document.getElementById('editSubProductId').value;
       const existing = subscriptionProducts.find(x => String(x.id) === String(id));
       if (!existing) return;
+      const newTotal = parseInt(document.getElementById('editSubTotalProfiles').value) || existing.totalProfiles || 5;
+      const profiles = [...(existing.profiles || [])];
+      while (profiles.length < newTotal) {
+        profiles.push({ number: profiles.length + 1, sold: false, soldBy: '', soldDate: '' });
+      }
       const updated = {
         ...existing,
         name: document.getElementById('editSubProductName').value.trim(),
         buyPrice: parseFloat(document.getElementById('editSubBuyPrice').value) || 0,
         fullPrice: parseFloat(document.getElementById('editSubFullPrice').value) || 0,
         soloPrice: parseFloat(document.getElementById('editSubSoloPrice').value) || 0,
-        sharedPrice: parseFloat(document.getElementById('editSubSharedPrice').value) || 0
+        sharedPrice: parseFloat(document.getElementById('editSubSharedPrice').value) || 0,
+        totalProfiles: newTotal,
+        profiles: profiles.slice(0, newTotal)
       };
       getRef('subscriptionProducts/' + id).update(updated).then(() => {
         closeEditSubscriptionModal();
@@ -3646,13 +4008,37 @@
     }
 
     // =================== ACCOUNT TRACKER ===================
-    function openAccountManagementModal() { document.getElementById('accountManagementModal').classList.add('show'); }
+    function openAccountManagementModal() {
+      document.getElementById('editingAccountOriginalKey').value = '';
+      document.getElementById('accountModalTitle').textContent = 'Add Streaming Account';
+      document.getElementById('accountModalSubmitBtn').textContent = 'Create Account';
+      document.getElementById('createAccountForm').reset();
+      document.getElementById('accountManagementModal').classList.add('show');
+    }
     function closeAccountManagementModal() { document.getElementById('accountManagementModal').classList.remove('show'); }
 
-    function saveAccount(e) {
+    function editAccount(accountId) {
+      const acc = accounts.find(a => a.id === accountId);
+      if (!acc) return;
+      document.getElementById('editingAccountOriginalKey').value = sanitizeUserKey(acc.id);
+      document.getElementById('accountModalTitle').textContent = 'Edit Streaming Account';
+      document.getElementById('accountModalSubmitBtn').textContent = 'Save Changes';
+      document.getElementById('accountIdInput').value = acc.id;
+      document.getElementById('accountProductSelect').value = acc.product || 'Netflix';
+      document.getElementById('accountStatus').value = acc.status || 'stock';
+      document.getElementById('accountProfilesInput').value = acc.totalProfiles || 5;
+      const pType = acc.profileType || 'solo';
+      const radio = document.querySelector(`input[name="accountProfileType"][value="${pType}"]`);
+      if (radio) radio.checked = true;
+      document.getElementById('accountManagementModal').classList.add('show');
+    }
+
+    async function saveAccount(e) {
       e.preventDefault();
+      const origKey = document.getElementById('editingAccountOriginalKey').value;
       const accountId = document.getElementById('accountIdInput').value.trim();
       if (!accountId) return;
+      const newKey = sanitizeUserKey(accountId);
       const status = document.getElementById('accountStatus').value || 'stock';
       const product = document.getElementById('accountProductSelect').value;
       const totalProfiles = parseInt(document.getElementById('accountProfilesInput').value) || 5;
@@ -3660,7 +4046,10 @@
       const slotsPerProfile = profileType === 'solo' ? 1 : 2;
 
       showSyncingIndicator();
-      getRef('accounts/' + sanitizeUserKey(accountId)).set({
+      if (origKey && origKey !== newKey) {
+        await getRef('accounts/' + origKey).remove();
+      }
+      await getRef('accounts/' + newKey).set({
         id: accountId,
         status,
         product,
@@ -3669,10 +4058,9 @@
         slotsPerProfile,
         createdDate: new Date().toISOString().split('T')[0],
         createdBy: currentSession.username
-      }).then(() => {
-        closeAccountManagementModal();
-        showToast('Account added!');
       });
+      closeAccountManagementModal();
+      showToast(origKey ? 'Account updated!' : 'Account added!');
     }
 
     function renderInventoryDashboard() {
@@ -3704,6 +4092,7 @@
               </div>
               <div style="display:flex; align-items:center; gap:6px;">
                 <span class="badge ${isSold ? 'badge-pending' : 'badge-verified'}">${isSold ? 'Sold' : 'In Stock'}</span>
+                <button class="btn btn-sm btn-outline" onclick="editAccount('${account.id}')">Edit</button>
                 ${isOwner() ? `<button class="btn btn-sm btn-danger" onclick="deleteAccount('${account.id}')">✕</button>` : ''}
               </div>
             </div>
@@ -3732,6 +4121,21 @@
       return getRef('settings/' + OWNER_SETTINGS_KEY + '/commissionBrackets');
     }
 
+    function getDefaultBracketsList() {
+      return [
+        { id: 1, minProfit: 1, maxProfit: 500, rate: 25 },
+        { id: 2, minProfit: 501, maxProfit: 999, rate: 30 },
+        { id: 3, minProfit: 1000, maxProfit: 1599, rate: 35 },
+        { id: 4, minProfit: 1600, maxProfit: null, rate: 40 }
+      ];
+    }
+
+    function isLegacyDefaultBrackets(list) {
+      if (!Array.isArray(list) || list.length !== 4) return false;
+      const rates = list.map(b => Number(b.rate)).sort((a, b) => a - b);
+      return rates[0] === 10 && rates[1] === 15 && rates[2] === 20 && rates[3] === 25;
+    }
+
     function loadCommissionBrackets() {
       getCommissionBracketsRef().on('value', (snapshot) => {
         if (snapshot.exists()) {
@@ -3740,17 +4144,19 @@
             commissionBrackets = Object.values(commissionBrackets);
           }
           commissionBrackets.sort((a, b) => a.minProfit - b.minProfit);
+          // Automatically upgrade legacy default brackets (10/15/20/25) to the new formula (25/30/35/40)
+          if (isLegacyDefaultBrackets(commissionBrackets)) {
+            commissionBrackets = getDefaultBracketsList();
+            getCommissionBracketsRef().set(commissionBrackets);
+          }
         } else {
-          commissionBrackets = [
-            { id: 1, minProfit: 0, maxProfit: 299.99, rate: 10 },
-            { id: 2, minProfit: 300, maxProfit: 599.99, rate: 15 },
-            { id: 3, minProfit: 600, maxProfit: 999.99, rate: 20 },
-            { id: 4, minProfit: 1000, maxProfit: null, rate: 25 }
-          ];
-          if (isOwner()) saveCommissionBrackets();
+          commissionBrackets = getDefaultBracketsList();
+          getCommissionBracketsRef().set(commissionBrackets);
         }
         renderCommissionBrackets();
         updateSalarySimulator();
+        updateUI();
+        renderProductList();
       });
     }
 
@@ -3759,24 +4165,57 @@
       getCommissionBracketsRef().set(commissionBrackets);
     }
 
+    function resetDefaultBrackets() {
+      if (!isOwner() || !confirm('Reset commission brackets to default tiers (25%, 30%, 35%, 40%)?')) return;
+      commissionBrackets = getDefaultBracketsList();
+      saveCommissionBrackets();
+      showToast('Brackets reset to 25% / 30% / 35% / 40%!');
+    }
+
+    async function recalculateAllSalesCommissions() {
+      if (!isOwner() || !confirm('Recalculate commission on all non-custom Admin sales using current rules (Sales - Capital = Profit, Profit × Rate% = Salary)?')) return;
+      showSyncingIndicator();
+      let count = 0;
+      for (const s of sales) {
+        if ((s.userRole || '').toLowerCase() === 'owner') continue;
+        if (s.customCommission !== undefined && s.customCommission !== null) continue;
+        const prod = findProductById(s.productId);
+        const u = users.find(x => String(x.id) === String(s.userId) || sanitizeUserKey(x.username) === s.userKey)
+          || { id: s.userId, username: s.soldBy, userKey: s.userKey, role: 'admin', commissionMode: 'bracket' };
+        const userSalesTotal = Math.max(getUserTotalVerifiedSales(u, sales), (Number(s.price) || 0) * (parseInt(s.quantity) || 1));
+        const newUnitComm = calculateUnitCommission(prod, s.price, s.buyPrice, u, userSalesTotal);
+        const qty = parseInt(s.quantity) || 1;
+        await getRef(`sales/${s.userKey}/${s.id}`).update({
+          commission: newUnitComm,
+          totalCommission: newUnitComm * qty
+        });
+        count++;
+      }
+      autoCalculatePayouts();
+      showToast(`Recalculated ${count} sales!`);
+    }
+
     function getCommissionRateForProfit(saleAmount, userId = null) {
       const user = userId ? users.find(u => String(u.id) === String(userId)) : currentSession;
-      if (user && user.commissionMode === 'flatRate') {
-        return Number(user.profitPercent) || 20;
+      if (user && (user.commissionMode === 'flatRate' || user.commissionMode === 'profitShare')) {
+        return Number(user.profitPercent) || (shopConfig.defaultRate ?? 25);
       }
       if (!commissionBrackets || commissionBrackets.length === 0) {
-        return user ? (Number(user.profitPercent) || 20) : 20;
+        return user ? (Number(user.profitPercent) || (shopConfig.defaultRate ?? 25)) : (shopConfig.defaultRate ?? 25);
       }
-      for (const b of commissionBrackets) {
+      const amt = Math.max(Number(saleAmount) || 0, 1);
+      for (let i = 0; i < commissionBrackets.length; i++) {
+        const b = commissionBrackets[i];
         const min = Number(b.minProfit) || 0;
         const max = b.maxProfit;
+        const nextMin = (i + 1 < commissionBrackets.length) ? Number(commissionBrackets[i + 1].minProfit) : null;
         if (max === null || max === undefined || max === '') {
-          if (saleAmount >= min) return Number(b.rate);
-        } else if (saleAmount >= min && saleAmount <= Number(max)) {
+          if (amt >= min) return Number(b.rate);
+        } else if (amt >= min && (amt <= Number(max) || (nextMin !== null && amt < nextMin))) {
           return Number(b.rate);
         }
       }
-      return 20;
+      return Number(commissionBrackets[0]?.rate) || (shopConfig.defaultRate ?? 25);
     }
 
     function renderCommissionBrackets() {
@@ -3788,54 +4227,87 @@
       }
       list.innerHTML = commissionBrackets.map(b => {
         const maxLabel = (b.maxProfit !== null && b.maxProfit !== undefined && b.maxProfit !== '')
-          ? formatCurrency(b.maxProfit)
-          : '& above';
+          ? `to ${formatCurrency(b.maxProfit)} sales`
+          : 'and up sales';
         return `
           <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 12px; background:var(--muted); border-radius:10px; margin-bottom:8px;">
             <div>
-              <span style="font-weight:600;">${formatCurrency(b.minProfit)} – ${maxLabel}</span>
+              <span style="font-weight:600;">🫙 ${b.rate}% = ${formatCurrency(b.minProfit)} ${maxLabel}</span>
             </div>
-            <div style="display:flex; align-items:center; gap:10px;">
-              <span class="badge badge-primary" style="font-size:12px;">${b.rate}% Commission</span>
-              ${isOwner() ? `<button class="btn btn-sm btn-danger" onclick="deleteBracket(${b.id})">✕</button>` : ''}
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span class="badge badge-primary" style="font-size:12px;">${b.rate}% of Profit</span>
+              ${isOwner() ? `
+                <button class="btn btn-sm btn-outline" onclick="editBracket('${b.id}')">Edit</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteBracket('${b.id}')">✕</button>
+              ` : ''}
             </div>
           </div>
         `;
       }).join('');
     }
 
-    function openAddBracketModal() { document.getElementById('commissionBracketModal').classList.add('show'); }
+    function openAddBracketModal() {
+      document.getElementById('editingBracketId').value = '';
+      document.getElementById('bracketModalTitle').textContent = 'Add Commission Bracket';
+      document.getElementById('addBracketForm').reset();
+      document.getElementById('commissionBracketModal').classList.add('show');
+    }
+
+    function editBracket(id) {
+      if (!isOwner()) return;
+      const b = commissionBrackets.find(x => String(x.id) === String(id));
+      if (!b) return;
+      document.getElementById('editingBracketId').value = b.id;
+      document.getElementById('bracketModalTitle').textContent = 'Edit Commission Bracket';
+      document.getElementById('bracketMinProfit').value = b.minProfit ?? 0;
+      document.getElementById('bracketMaxProfit').value = (b.maxProfit !== null && b.maxProfit !== undefined) ? b.maxProfit : '';
+      document.getElementById('bracketRate').value = b.rate ?? 25;
+      document.getElementById('commissionBracketModal').classList.add('show');
+    }
+
     function closeCommissionBracketModal() { document.getElementById('commissionBracketModal').classList.remove('show'); }
 
     document.getElementById('addBracketForm').addEventListener('submit', function(e) {
       e.preventDefault();
       if (!isOwner()) return;
+      const editingId = document.getElementById('editingBracketId').value;
       const minProfit = parseFloat(document.getElementById('bracketMinProfit').value) || 0;
       const maxRaw = document.getElementById('bracketMaxProfit').value;
-      const maxProfit = maxRaw ? parseFloat(maxRaw) : null;
+      const maxProfit = maxRaw !== '' ? parseFloat(maxRaw) : null;
       const rate = parseFloat(document.getElementById('bracketRate').value) || 0;
-      commissionBrackets.push({ id: Date.now(), minProfit, maxProfit, rate });
+
+      if (editingId) {
+        commissionBrackets = commissionBrackets.map(b =>
+          String(b.id) === String(editingId) ? { ...b, minProfit, maxProfit, rate } : b
+        );
+      } else {
+        commissionBrackets.push({ id: Date.now(), minProfit, maxProfit, rate });
+      }
       commissionBrackets.sort((a, b) => a.minProfit - b.minProfit);
       saveCommissionBrackets();
       this.reset();
       closeCommissionBracketModal();
-      showToast('Bracket added!');
+      showToast(editingId ? 'Bracket updated!' : 'Bracket added!');
     });
 
     function deleteBracket(id) {
       if (!isOwner() || !confirm('Delete this bracket?')) return;
-      commissionBrackets = commissionBrackets.filter(b => b.id !== id);
+      commissionBrackets = commissionBrackets.filter(b => String(b.id) !== String(id));
       saveCommissionBrackets();
     }
 
     function updateSalarySimulator() {
-      const price = parseFloat(document.getElementById('simPriceInput')?.value) || 0;
-      const qty = parseInt(document.getElementById('simQtyInput')?.value) || 1;
-      const rate = getCommissionRateForProfit(price);
-      const salary = (price * (rate / 100)) * qty;
-      document.getElementById('simTotalSale').textContent = formatCurrency(price * qty);
-      document.getElementById('simRate').textContent = `${rate}%`;
-      document.getElementById('simSalary').textContent = formatCurrency(salary);
+      const totalSales = parseFloat(document.getElementById('simPriceInput')?.value) || 0;
+      const totalCapital = parseFloat(document.getElementById('simCapitalInput')?.value) || 0;
+      const profit = Math.max(totalSales - totalCapital, 0); // sales - capital = profit
+      const rate = getCommissionRateForProfit(totalSales);
+      const salary = profit * (rate / 100); // profit * rate% = salary
+      const profitEl = document.getElementById('simTotalProfit');
+      if (profitEl) profitEl.textContent = formatCurrency(profit);
+      const rateEl = document.getElementById('simRate');
+      if (rateEl) rateEl.textContent = `${rate}%`;
+      const salaryEl = document.getElementById('simSalary');
+      if (salaryEl) salaryEl.textContent = formatCurrency(salary);
     }
 
     // =================== PAYOUTS & SALARY VIEW ===================
@@ -3851,7 +4323,7 @@
       adminUsers.forEach(user => {
         const uKey = sanitizeUserKey(user.username);
         const userSales = sales.filter(s => (String(s.userId) === String(user.id) || s.userKey === uKey) && s.sold);
-        const totalCommission = userSales.reduce((sum, s) => sum + ((Number(s.commission) || 0) * (parseInt(s.quantity) || 1)), 0);
+        const totalCommission = userSales.reduce((sum, s) => sum + (getEffectiveSaleUnitCommission(s, sales) * (parseInt(s.quantity) || 1)), 0);
         const paidTotal = payouts
           .filter(p => String(p.userId) === String(user.id) && p.status === 'paid')
           .reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
@@ -3899,7 +4371,7 @@
             </div>
             <div style="display:flex; align-items:center; gap:10px;">
               <span style="font-size:15px; font-weight:700; color:var(--primary);">${formatCurrency(payout.amount)}</span>
-              ${isOwner() ? `<button class="btn btn-sm btn-primary" onclick="openMarkPaidModal('${payout.id}', '${payout.userId}', ${payout.amount})">Mark Paid</button>` : ''}
+              ${isOwner() ? `<button class="btn btn-sm btn-primary" onclick="openMarkPaidModal('${payout.id}', '${payout.userId}', ${payout.amount})">Pay / Adjust</button>` : ''}
             </div>
           </div>
         `;
@@ -3931,11 +4403,12 @@
         id: historyId, userId, amount, method, reference, notes,
         period: currentPayoutPeriod, paidDate, timestamp: historyId
       }).then(() => {
-        return getRef('payouts/' + payoutId).update({ status: 'paid', paidDate, method, reference });
+        return getRef('payouts/' + payoutId).update({ amount, status: 'paid', paidDate, method, reference });
       }).then(() => {
         closeMarkPaidModal();
         loadPayoutHistory();
-        showToast('Payout marked as paid!');
+        autoCalculatePayouts();
+        showToast('Payout recorded!');
       });
     }
 
@@ -3949,7 +4422,7 @@
         const tbody = document.getElementById('payoutHistoryBody');
         if (!tbody) return;
         if (arr.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--muted-foreground); padding:20px;">No payout history yet</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--muted-foreground); padding:20px;">No payout history yet</td></tr>`;
           return;
         }
         tbody.innerHTML = arr.map(r => {
@@ -3964,29 +4437,70 @@
               <td>${r.method || '-'}</td>
               <td>${r.reference || '-'}</td>
               <td>${r.notes || '-'}</td>
+              ${isOwner() ? `<td><button class="btn btn-sm btn-danger" onclick="deletePayoutHistory('${r.id}')">✕</button></td>` : ''}
             </tr>
           `;
         }).join('');
       });
     }
 
+    function deletePayoutHistory(historyId) {
+      if (!isOwner() || !confirm('Delete this payout history record?')) return;
+      getRef('payoutHistory/' + historyId).remove().then(() => {
+        loadPayoutHistory();
+        showToast('Payout record deleted');
+      });
+    }
+
     // =================== MANAGE USERS (OWNER) ===================
-    function openAddUserModal() { document.getElementById('userModal').classList.add('show'); }
+    function openAddUserModal() {
+      document.getElementById('addUserForm').reset();
+      toggleNewUserCommFields();
+      document.getElementById('userModal').classList.add('show');
+    }
     function closeUserModal() { document.getElementById('userModal').classList.remove('show'); }
 
-    document.querySelectorAll('input[name="commissionMode"]').forEach(r => {
-      r.addEventListener('change', function() {
-        document.getElementById('flatRateSection').style.display = this.value === 'flatRate' ? 'flex' : 'none';
-      });
-    });
+    function toggleNewUserCommFields() {
+      const mode = document.getElementById('newUserCommMode')?.value || 'bracket';
+      const sec = document.getElementById('flatRateSection');
+      const lbl = document.getElementById('newUserCommValueLabel');
+      if (!sec || !lbl) return;
+      if (mode === 'bracket') {
+        sec.style.display = 'none';
+      } else {
+        sec.style.display = 'flex';
+        if (mode === 'flatRate') lbl.textContent = 'Flat Commission Rate (% of Sale)';
+        else if (mode === 'profitShare') lbl.textContent = 'Profit Share (% of Net Profit)';
+        else if (mode === 'fixedPerSale') lbl.textContent = 'Fixed Commission Amount (per Unit)';
+      }
+    }
+
+    function toggleEditUserCommFields() {
+      const mode = document.getElementById('editUserCommModeSelect')?.value || 'bracket';
+      const sec = document.getElementById('editFlatRateSection');
+      const info = document.getElementById('editBracketInfoSection');
+      const lbl = document.getElementById('editUserCommValueLabel');
+      if (!sec || !info || !lbl) return;
+      if (mode === 'bracket') {
+        sec.style.display = 'none';
+        info.style.display = 'block';
+      } else {
+        sec.style.display = 'flex';
+        info.style.display = 'none';
+        if (mode === 'flatRate') lbl.textContent = 'Flat Commission Rate (% of Sale)';
+        else if (mode === 'profitShare') lbl.textContent = 'Profit Share (% of Net Profit)';
+        else if (mode === 'fixedPerSale') lbl.textContent = 'Fixed Commission Amount (per Unit)';
+      }
+    }
 
     document.getElementById('addUserForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const customName = document.getElementById('newUserName').value.trim();
       const rawUsername = document.getElementById('newUsername').value.trim().replace(/^@/, '');
       const rawPassword = document.getElementById('newPassword').value.trim();
-      const commissionMode = document.querySelector('input[name="commissionMode"]:checked')?.value || 'bracket';
-      const profitPercent = commissionMode === 'flatRate' ? (parseFloat(document.getElementById('newProfitPercent').value) || 20) : 0;
+      const role = document.getElementById('newUserRole')?.value || 'admin';
+      const commissionMode = document.getElementById('newUserCommMode')?.value || 'bracket';
+      const profitPercent = commissionMode !== 'bracket' ? (parseFloat(document.getElementById('newProfitPercent').value) || 0) : 25;
       const userKey = sanitizeUserKey(rawUsername);
 
       getRef('users/' + userKey).once('value').then(snap => {
@@ -4000,49 +4514,62 @@
           username: rawUsername,
           password: hashPassword(rawPassword),
           plainPassword: rawPassword,
-          role: 'admin',
+          role,
           commissionMode,
           profitPercent,
           createdDate: new Date().toISOString().split('T')[0]
         }).then(() => {
           this.reset();
           closeUserModal();
-          showToast('Admin created!');
+          showToast('Profile created!');
         });
       });
     });
 
+    function formatUserCommModeLabel(user) {
+      if ((user.role || '').toLowerCase() === 'owner') return '100% Net Profit';
+      const mode = user.commissionMode || 'bracket';
+      const val = Number(user.profitPercent) || 0;
+      if (mode === 'flatRate') return `Flat ${val}% of Sale`;
+      if (mode === 'profitShare') return `${val}% of Profit`;
+      if (mode === 'fixedPerSale') return `${formatCurrency(val)} / Unit`;
+      return 'Bracket-Based (25%–40% of Profit)';
+    }
+
     function renderUserList() {
       const container = document.getElementById('userList');
       if (!container) return;
-      const admins = users.filter(u => (u.role || '').toLowerCase() === 'admin');
-      if (admins.length === 0) {
-        container.innerHTML = `<div class="empty-box" style="grid-column:1/-1;"><p>No admins yet. Click "+ Add Admin" to create one.</p></div>`;
+      if (users.length === 0) {
+        container.innerHTML = `<div class="empty-box" style="grid-column:1/-1;"><p>No profiles yet. Click "+ Add Profile" to create one.</p></div>`;
         return;
       }
-      container.innerHTML = admins.map(user => {
+      container.innerHTML = users.map(user => {
         const uKey = sanitizeUserKey(user.username);
         const userSales = sales.filter(s => (String(s.userId) === String(user.id) || s.userKey === uKey) && s.sold);
         const totalSales = userSales.reduce((sum, s) => sum + (Number(s.totalPrice) || 0), 0);
-        const totalSalary = userSales.reduce((sum, s) => sum + ((Number(s.commission) || 0) * (parseInt(s.quantity) || 1)), 0);
-        const modeLabel = user.commissionMode === 'flatRate' ? `Flat ${user.profitPercent}%` : 'Bracket-Based';
-        const displayName = (user.customName || user.username).replace(/^@/, '');
+        const totalProfit = userSales.reduce((sum, s) => sum + (((Number(s.price) || 0) - (Number(s.buyPrice) || 0)) * (parseInt(s.quantity) || 1)), 0);
+        const totalSalary = userSales.reduce((sum, s) => sum + (getEffectiveSaleUnitCommission(s, sales) * (parseInt(s.quantity) || 1)), 0);
+        const modeLabel = formatUserCommModeLabel(user);
+        const displayName = (user.customName || user.username || 'User').replace(/^@/, '');
+        const roleBadge = (user.role || 'admin').toLowerCase() === 'owner' ? 'Owner' : 'Admin';
+        const pinHint = user.plainPassword ? ` • PIN: ${user.plainPassword}` : '';
 
         return `
           <div class="item-card">
             <div class="item-card-header">
               <div>
-                <div class="item-card-title">${displayName}</div>
-                <div class="item-card-sub">@${user.username.replace(/^@/, '')} • ${modeLabel}</div>
+                <div class="item-card-title">${displayName} <span class="badge badge-secondary" style="margin-left:4px;">${roleBadge}</span></div>
+                <div class="item-card-sub">@${(user.username || '').replace(/^@/, '')} • ${modeLabel}${pinHint}</div>
               </div>
               <div style="display:flex; gap:4px;">
-                <button class="btn btn-sm btn-outline" onclick="openEditCommissionModal('${user.id}')">Rules</button>
+                <button class="btn btn-sm btn-outline" onclick="openEditCommissionModal('${user.id}')">Edit</button>
                 <button class="btn btn-sm btn-danger" onclick="deleteUser('${user.id}')">✕</button>
               </div>
             </div>
             <div class="metrics-mini-grid">
               <div><div class="metric-mini-label">Total Sales</div><div class="metric-mini-val">${formatCurrency(totalSales)}</div></div>
-              <div><div class="metric-mini-label">Total Salary</div><div class="metric-mini-val" style="color:var(--primary);">${formatCurrency(totalSalary)}</div></div>
+              <div><div class="metric-mini-label">Profit (Sale–Cap)</div><div class="metric-mini-val" style="color:var(--success);">${formatCurrency(totalProfit)}</div></div>
+              <div><div class="metric-mini-label">${roleBadge === 'Owner' ? 'Net Profit' : 'Salary'}</div><div class="metric-mini-val" style="color:var(--primary);">${formatCurrency(roleBadge === 'Owner' ? totalProfit : totalSalary)}</div></div>
             </div>
           </div>
         `;
@@ -4054,41 +4581,52 @@
       if (!user) return;
       document.getElementById('editUserId').value = user.id;
       document.getElementById('editUserName').value = (user.customName || user.username).replace(/^@/, '');
+      if (document.getElementById('editUserRole')) {
+        document.getElementById('editUserRole').value = (user.role || 'admin').toLowerCase();
+      }
+      if (document.getElementById('editUserPassword')) {
+        document.getElementById('editUserPassword').value = '';
+      }
       const mode = user.commissionMode || 'bracket';
-      document.getElementById(mode === 'flatRate' ? 'editCommissionFlatRate' : 'editCommissionBracket').checked = true;
-      document.getElementById('editProfitPercent').value = user.profitPercent || 20;
-      document.getElementById('editFlatRateSection').style.display = mode === 'flatRate' ? 'flex' : 'none';
-      document.getElementById('editBracketInfoSection').style.display = mode === 'flatRate' ? 'none' : 'block';
+      if (document.getElementById('editUserCommModeSelect')) {
+        document.getElementById('editUserCommModeSelect').value = mode;
+      }
+      document.getElementById('editProfitPercent').value = user.profitPercent ?? 20;
+      toggleEditUserCommFields();
       document.getElementById('editCommissionModal').classList.add('show');
     }
     function closeEditCommissionModal() { document.getElementById('editCommissionModal').classList.remove('show'); }
-
-    document.querySelectorAll('input[name="editCommissionMode"]').forEach(r => {
-      r.addEventListener('change', function() {
-        document.getElementById('editFlatRateSection').style.display = this.value === 'flatRate' ? 'flex' : 'none';
-        document.getElementById('editBracketInfoSection').style.display = this.value === 'flatRate' ? 'none' : 'block';
-      });
-    });
 
     document.getElementById('editCommissionForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const userId = document.getElementById('editUserId').value;
       const user = users.find(u => String(u.id) === String(userId));
       if (!user) return;
-      const commissionMode = document.querySelector('input[name="editCommissionMode"]:checked')?.value || 'bracket';
-      const profitPercent = commissionMode === 'flatRate' ? (parseFloat(document.getElementById('editProfitPercent').value) || 20) : 0;
+      const customName = document.getElementById('editUserName').value.trim();
+      const role = document.getElementById('editUserRole')?.value || user.role || 'admin';
+      const newPass = document.getElementById('editUserPassword')?.value.trim();
+      const commissionMode = document.getElementById('editUserCommModeSelect')?.value || 'bracket';
+      const profitPercent = commissionMode !== 'bracket' ? (parseFloat(document.getElementById('editProfitPercent').value) || 0) : 20;
       const key = user.key || sanitizeUserKey(user.username);
-      getRef('users/' + key).update({ commissionMode, profitPercent }).then(() => {
+
+      const updates = { customName, role, commissionMode, profitPercent };
+      if (newPass) {
+        updates.password = hashPassword(newPass);
+        updates.plainPassword = newPass;
+      }
+
+      showSyncingIndicator();
+      getRef('users/' + key).update(updates).then(() => {
         closeEditCommissionModal();
-        showToast('Commission settings updated!');
+        showToast('User & commission rules updated!');
       });
     });
 
     function deleteUser(userId) {
       const user = users.find(u => String(u.id) === String(userId));
-      if (!user || !confirm(`Delete admin ${user.customName || user.username}?`)) return;
+      if (!user || !confirm(`Delete profile ${user.customName || user.username}?`)) return;
       const key = user.key || sanitizeUserKey(user.username);
-      getRef('users/' + key).remove().then(() => showToast('Admin deleted'));
+      getRef('users/' + key).remove().then(() => showToast('Profile deleted'));
     }
 
     // =================== SETTINGS & EXPORT ===================
@@ -4115,6 +4653,21 @@
       document.getElementById('dashboardSubtitle').textContent = `Welcome back, ${newName}`;
       document.getElementById('settingsNewPassword').value = '';
       showToast('Profile updated!');
+    });
+
+    document.getElementById('ownerShopSettingsForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      if (!isOwner()) return;
+      const shopName = document.getElementById('settingsShopName').value.trim() || 'Ryde';
+      const currency = document.getElementById('settingsCurrencySymbol').value.trim() || '₱';
+      const defaultRate = parseFloat(document.getElementById('settingsDefaultRate').value) || 20;
+      showSyncingIndicator();
+      await getRef('settings/' + OWNER_SETTINGS_KEY + '/shopConfig').set({
+        shopName,
+        currency,
+        defaultRate
+      });
+      showToast('Shop & commission defaults saved!');
     });
 
     function exportToCSV() {
