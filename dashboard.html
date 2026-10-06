@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
-    :root {
+        :root {
       --background: #faf6f7;
       --foreground: #1f0d12;
       --card: #ffffff;
@@ -842,7 +842,7 @@
 
     .metrics-mini-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
       gap: 8px;
       background-color: var(--muted);
       padding: 10px;
@@ -1146,7 +1146,7 @@
 
         <button class="nav-item" data-view="products" id="navBtnProducts">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg>
-          <span>Product List</span>
+          <span>Subscription Products</span>
         </button>
 
         <button class="nav-item" data-view="salary-rules">
@@ -1174,7 +1174,7 @@
         <div class="user-mini">
           <div class="user-avatar-sm" id="userAvatar">R</div>
           <div class="user-mini-info">
-            <p class="user-mini-name" id="userName">ryde</p>
+            <p class="user-mini-name" id="userName">sxo</p>
             <p class="user-mini-role" id="userRole">Owner</p>
           </div>
         </div>
@@ -1193,7 +1193,7 @@
           <button class="menu-trigger" id="openSidebarBtn" aria-label="Open menu">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
           </button>
-          <span class="mobile-brand-text">Ryde</span>
+          <span class="mobile-brand-text">SXO</span>
         </div>
 
         <div class="header-right">
@@ -1399,35 +1399,16 @@
         <section id="view-products" class="page-view">
           <div class="page-header">
             <div>
-              <h1 class="page-title">Product List</h1>
-              <p class="page-subtitle">Catalog pricing, margins, and commissions</p>
+              <h1 class="page-title">Subscription Products</h1>
+              <p class="page-subtitle">Manage subscription plans, profile pricing, and slot capacity</p>
             </div>
             <div class="header-controls" id="ownerProductActions">
-              <button class="btn btn-outline" onclick="openAddSubscriptionModal()">+ Add Subscription</button>
-              <button class="btn btn-primary" onclick="openAddProductModal()">+ Add Product</button>
+              <button class="btn btn-outline" onclick="openManageAppsModal()">⚙️ Manage Apps</button>
+              <button class="btn btn-primary" onclick="openAddSubscriptionModal()">+ Add Subscription Product</button>
             </div>
           </div>
 
-          <div class="sub-tabs">
-            <button class="sub-tab active" id="tabRegularProducts" onclick="switchProductTab('regular')">Regular Products</button>
-            <button class="sub-tab" id="tabSubProducts" onclick="switchProductTab('subscription')">Subscription Products</button>
-          </div>
-
-          <div id="regularProductsPane">
-            <div class="filter-bar">
-              <div class="search-wrap">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                <input type="text" id="productSearch" class="input-control" placeholder="Search products..." oninput="renderProductList()">
-              </div>
-              <select id="productSortSelect" class="select-control" onchange="sortProducts(this.value)">
-                <option value="name">Sort by Name</option>
-                <option value="price">Sort by Price</option>
-              </select>
-            </div>
-            <div id="productList" class="cards-grid"></div>
-          </div>
-
-          <div id="subscriptionProductsPane" style="display:none;">
+          <div id="subscriptionProductsPane">
             <div id="subscriptionProductList" class="cards-grid"></div>
           </div>
         </section>
@@ -1577,8 +1558,26 @@
                   <input type="text" id="settingsDisplayName" class="input-control" required>
                 </div>
                 <div class="form-field">
-                  <label>Avatar Image URL (Optional)</label>
-                  <input type="url" id="settingsAvatarUrl" class="input-control" placeholder="https://...">
+                  <label>Profile Picture (Avatar)</label>
+                  <div style="display:flex; align-items:center; gap:14px; margin-top:6px; padding:12px; background:var(--muted); border-radius:12px; border:1px solid var(--border);">
+                    <div id="settingsAvatarPreview" onclick="document.getElementById('settingsAvatarFile').click()" title="Click to change photo" style="width:64px; height:64px; border-radius:9999px; background:var(--primary-soft); color:var(--primary); display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:700; overflow:hidden; border:2px solid var(--primary); cursor:pointer; flex-shrink:0; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+                      U
+                    </div>
+                    <div style="flex:1; display:flex; flex-direction:column; gap:6px;">
+                      <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                        <label class="btn btn-sm btn-primary" style="cursor:pointer; display:inline-flex; align-items:center; gap:6px; margin:0;">
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                          <span>Upload from Phone / PC</span>
+                          <input type="file" id="settingsAvatarFile" accept="image/*" style="display:none;">
+                        </label>
+                        <button type="button" class="btn btn-sm btn-outline" id="btnRemoveAvatar" onclick="removeCurrentAvatar()" style="color:var(--destructive); border-color:var(--border);">
+                          Remove
+                        </button>
+                      </div>
+                      <input type="url" id="settingsAvatarUrl" class="input-control" placeholder="Or paste image URL (https://...)" style="font-size:12px; height:32px; padding:0 8px;">
+                      <span style="font-size:11px; color:var(--muted-foreground);">Photos from mobile camera or PC are auto-optimized for fast loading</span>
+                    </div>
+                  </div>
                 </div>
                 <div class="form-field">
                   <label>New PIN / Password (leave blank to keep current)</label>
@@ -1595,7 +1594,7 @@
               <form id="ownerShopSettingsForm" class="form-grid">
                 <div class="form-field">
                   <label>Shop / Brand Name</label>
-                  <input type="text" id="settingsShopName" class="input-control" placeholder="Ryde" required>
+                  <input type="text" id="settingsShopName" class="input-control" placeholder="SXO" required>
                 </div>
                 <div class="form-grid two-col">
                   <div class="form-field">
@@ -1663,18 +1662,12 @@
           </div>
         </div>
 
-        <!-- Owner-Only Sale Overrides (Cost, Custom Commission, Date, Assigned User) -->
+        <!-- Owner-Only Sale Overrides (Custom Commission, Date, Assigned User) -->
         <div id="ownerSaleOverrides" style="display:none; border:1px solid var(--border); background:var(--muted); border-radius:10px; padding:12px;" class="form-grid">
           <div style="font-size:11px; font-weight:600; color:var(--primary); text-transform:uppercase; letter-spacing:0.05em;">Owner Controls & Commission Override</div>
-          <div class="form-grid two-col">
-            <div class="form-field">
-              <label>Unit Cost / Capital</label>
-              <input type="number" id="saleBuyPriceInput" class="input-control" step="0.01" min="0" placeholder="Auto from product">
-            </div>
-            <div class="form-field">
-              <label>Unit Commission (leave blank = auto)</label>
-              <input type="number" id="saleCustomCommissionInput" class="input-control" step="0.01" min="0" placeholder="Auto-calculated">
-            </div>
+          <div class="form-field">
+            <label>Unit Commission (leave blank = auto-calculate)</label>
+            <input type="number" id="saleCustomCommissionInput" class="input-control" step="0.01" min="0" placeholder="Auto-calculated">
           </div>
           <div class="form-grid two-col">
             <div class="form-field">
@@ -1716,7 +1709,9 @@
           </div>
           <div class="form-field">
             <label>Account Email</label>
-            <input type="email" id="accountEmailInput" class="input-control" placeholder="account@email.com" required>
+            <input type="email" id="accountEmailInput" class="input-control" placeholder="account@email.com" list="accountEmailDatalist" required autocomplete="off" oninput="checkAccountEmailStock()">
+            <datalist id="accountEmailDatalist"></datalist>
+            <div id="accountStockHint" style="display:none; font-size:12px; margin-top:4px; font-weight:500;"></div>
           </div>
         </div>
 
@@ -1743,6 +1738,30 @@
             <option value="yes">Verified / Sold</option>
             <option value="no">Pending / In Stock</option>
           </select>
+        </div>
+
+        
+        <!-- Proof of Payment / Receipt Photo Attachment -->
+        <div class="form-field">
+          <label>Receipt / Proof of Payment (Optional)</label>
+          <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <label class="btn btn-sm btn-outline" style="cursor:pointer; display:inline-flex; align-items:center; gap:6px; margin:0;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              <span>📷 Attach Receipt / Photo</span>
+              <input type="file" id="saleReceiptFileInput" accept="image/*" style="display:none;" onchange="handleReceiptFileUpload(event)">
+            </label>
+            <input type="url" id="saleReceiptUrlInput" class="input-control" placeholder="Or paste image URL (https://...)" style="flex:1; min-width:180px; font-size:12px;" oninput="handleReceiptUrlInput(this.value)">
+          </div>
+          <div id="saleReceiptPreviewWrap" style="display:none; align-items:center; gap:10px; margin-top:8px; padding:8px 12px; background:var(--muted); border-radius:10px; border:1px solid var(--border);">
+            <img id="saleReceiptPreviewImg" src="" alt="Receipt Preview" style="width:48px; height:48px; object-fit:cover; border-radius:8px; border:1px solid var(--border); cursor:pointer;" onclick="viewReceiptImageInViewer(this.src, 'Receipt Preview')">
+            <div style="flex:1;">
+              <div style="font-size:12px; font-weight:600; color:var(--success);">✓ Receipt Attached</div>
+              <div style="font-size:11px; color:var(--muted-foreground);" id="saleReceiptFileName">Photo ready to save</div>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline" onclick="removeAttachedReceipt()" style="color:var(--destructive); border-color:var(--border); padding:2px 8px; font-size:11px;">
+              Remove
+            </button>
+          </div>
         </div>
 
         <!-- Optional Streaming Account Tracking Fields (shown only when matching account exists) -->
@@ -1815,7 +1834,6 @@
               <th>Warranty</th>
               <th>Buyer</th>
               <th>Email</th>
-              <th>Cost</th>
               <th>Sell</th>
               <th>Qty</th>
               <th>Status</th>
@@ -1940,31 +1958,29 @@
       </div>
       <form id="addSubscriptionForm" class="form-grid">
         <div class="form-field">
-          <label>Subscription Name</label>
-          <input type="text" id="subProductName" class="input-control" placeholder="e.g. Netflix Premium 4K" required>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <label style="margin:0;">App / Service</label>
+            <button type="button" class="btn btn-sm btn-outline" onclick="openManageAppsModal()" style="font-size:11px; padding:2px 8px;">⚙️ Manage Apps</button>
+          </div>
+          <input type="text" id="subProductName" class="input-control" placeholder="Select or type app (e.g. Netflix, ChatGPT)" list="shopAppsDatalist" required autocomplete="off" style="margin-top:4px;">
+          <datalist id="shopAppsDatalist"></datalist>
+        </div>
+        <div class="form-field">
+          <label>Full Account Price (₱)</label>
+          <input type="number" id="subFullPrice" class="input-control" step="0.01" min="0" placeholder="0.00" required>
         </div>
         <div class="form-grid two-col">
           <div class="form-field">
-            <label>Buy Cost</label>
-            <input type="number" id="subBuyPrice" class="input-control" step="0.01" min="0" required>
+            <label>Solo Profile Price (₱)</label>
+            <input type="number" id="subSoloPrice" class="input-control" step="0.01" min="0" placeholder="0.00" required>
           </div>
           <div class="form-field">
-            <label>Full Account Price</label>
-            <input type="number" id="subFullPrice" class="input-control" step="0.01" min="0" required>
-          </div>
-        </div>
-        <div class="form-grid two-col">
-          <div class="form-field">
-            <label>Solo Profile Price</label>
-            <input type="number" id="subSoloPrice" class="input-control" step="0.01" min="0" required>
-          </div>
-          <div class="form-field">
-            <label>Shared Profile Price</label>
-            <input type="number" id="subSharedPrice" class="input-control" step="0.01" min="0" required>
+            <label>Shared Profile Price (₱)</label>
+            <input type="number" id="subSharedPrice" class="input-control" step="0.01" min="0" placeholder="0.00" required>
           </div>
         </div>
         <div class="form-field">
-          <label>Total Profiles</label>
+          <label>Total Profiles / Slots</label>
           <input type="number" id="subTotalProfiles" class="input-control" value="5" min="1" max="20" required>
         </div>
         <button type="submit" class="btn btn-primary">Create Subscription Product</button>
@@ -1982,31 +1998,25 @@
       <form id="editSubscriptionForm" onsubmit="saveSubscriptionEdit(event)" class="form-grid">
         <input type="hidden" id="editSubProductId">
         <div class="form-field">
-          <label>Subscription Name</label>
-          <input type="text" id="editSubProductName" class="input-control" required>
+          <label>App / Subscription Name</label>
+          <input type="text" id="editSubProductName" class="input-control" list="shopAppsDatalist" required>
+        </div>
+        <div class="form-field">
+          <label>Full Account Price (₱)</label>
+          <input type="number" id="editSubFullPrice" class="input-control" step="0.01" min="0" required>
         </div>
         <div class="form-grid two-col">
           <div class="form-field">
-            <label>Buy Cost</label>
-            <input type="number" id="editSubBuyPrice" class="input-control" step="0.01" min="0" required>
-          </div>
-          <div class="form-field">
-            <label>Full Account Price</label>
-            <input type="number" id="editSubFullPrice" class="input-control" step="0.01" min="0" required>
-          </div>
-        </div>
-        <div class="form-grid two-col">
-          <div class="form-field">
-            <label>Solo Price</label>
+            <label>Solo Profile Price (₱)</label>
             <input type="number" id="editSubSoloPrice" class="input-control" step="0.01" min="0" required>
           </div>
           <div class="form-field">
-            <label>Shared Price</label>
+            <label>Shared Profile Price (₱)</label>
             <input type="number" id="editSubSharedPrice" class="input-control" step="0.01" min="0" required>
           </div>
         </div>
         <div class="form-field">
-          <label>Total Profiles</label>
+          <label>Total Profiles / Slots</label>
           <input type="number" id="editSubTotalProfiles" class="input-control" min="1" max="20" required>
         </div>
         <button type="submit" class="btn btn-primary">Save Changes</button>
@@ -2024,24 +2034,24 @@
       <form id="createAccountForm" onsubmit="saveAccount(event)" class="form-grid">
         <input type="hidden" id="editingAccountOriginalKey">
         <div class="form-field">
-          <label>Account ID / Label</label>
-          <input type="text" id="accountIdInput" class="input-control" placeholder="e.g. NF-001 or email" required>
+          <label>Account ID / Email</label>
+          <input type="text" id="accountIdInput" class="input-control" placeholder="account@email.com" required>
         </div>
         <div class="form-grid two-col">
           <div class="form-field">
-            <label>Service / Category</label>
-            <select id="accountProductSelect" class="select-control">
-              <option value="Netflix">Netflix</option>
-              <option value="Disney">Disney+</option>
-              <option value="HBO">HBO Max</option>
-              <option value="YouTube">YouTube</option>
-              <option value="Prime Video">Prime Video</option>
-              <option value="Spotify">Spotify</option>
-              <option value="Canva">Canva</option>
-              <option value="ChatGPT">ChatGPT</option>
-              <option value="VIU">VIU</option>
-              <option value="Vivamax">Vivamax</option>
-            </select>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <label style="margin:0;">App / Service</label>
+              <button type="button" class="btn btn-sm btn-outline" onclick="openManageAppsModal()" style="font-size:11px; padding:2px 8px;">⚙️ Manage Apps</button>
+            </div>
+            <div style="display:flex; gap:6px; margin-top:4px;">
+              <select id="accountProductSelect" class="select-control" style="flex:1;" onchange="onAccountAppSelectChange(this.value)">
+                <!-- populated dynamically from shopApps -->
+              </select>
+              <input type="text" id="customAppInput" class="input-control" placeholder="Type new app name" style="flex:1; display:none;">
+              <button type="button" id="btnToggleCustomApp" class="btn btn-sm btn-outline" onclick="toggleCustomAppInput()" title="Type custom app name">
+                ✏️ Custom
+              </button>
+            </div>
           </div>
           <div class="form-field">
             <label>Status</label>
@@ -2066,6 +2076,28 @@
         </div>
         <button type="submit" id="accountModalSubmitBtn" class="btn btn-primary">Save Account</button>
       </form>
+    </div>
+  </div>
+
+  <!-- Manage Apps Modal -->
+  <div id="manageAppsModal" class="modal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Manage Apps & Services</h3>
+        <button type="button" class="modal-close-btn" onclick="closeManageAppsModal()">✕</button>
+      </div>
+      <div class="form-grid">
+        <p style="font-size:12px; color:var(--muted-foreground); margin:0;">
+          Add or remove apps (e.g. Netflix, ChatGPT, CapCut). They will instantly appear in all dropdowns and subscription products.
+        </p>
+        <div style="display:flex; gap:8px;">
+          <input type="text" id="newAppNameInput" class="input-control" placeholder="Enter app name (e.g. CapCut, Claude)">
+          <button type="button" class="btn btn-primary" onclick="addNewAppFromModal()">+ Add App</button>
+        </div>
+        <div id="appsChipsContainer" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; max-height:220px; overflow-y:auto; padding:10px; background:var(--muted); border-radius:10px; border:1px solid var(--border);">
+          <!-- chips -->
+        </div>
+      </div>
     </div>
   </div>
 
@@ -2171,6 +2203,17 @@
         <div class="form-field">
           <label>Reset PIN / Password (leave blank to keep current)</label>
           <input type="text" id="editUserPassword" class="input-control" placeholder="Enter new PIN or password">
+        </div>
+        <div class="form-field">
+          <label>Profile Picture (Avatar)</label>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div id="editUserAvatarPreview" style="width:40px; height:40px; border-radius:9999px; background:var(--primary-soft); color:var(--primary); display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; overflow:hidden; flex-shrink:0;">U</div>
+            <input type="url" id="editUserAvatarUrl" class="input-control" placeholder="Paste Image URL">
+            <label class="btn btn-sm btn-outline" style="cursor:pointer; white-space:nowrap;">
+              📁 Upload
+              <input type="file" id="editUserAvatarFile" accept="image/*" style="display:none;">
+            </label>
+          </div>
         </div>
         <div class="form-field">
           <label>Commission Mode</label>
@@ -2302,6 +2345,8 @@
         refreshPayoutViews();
       } else if (viewName === 'salary-rules') {
         updateSalarySimulator();
+      } else if (viewName === 'accounts') {
+        renderInventoryDashboard();
       }
     }
 
@@ -2328,6 +2373,9 @@
 
     // =================== FIREBASE CONFIGURATION ===================
     const APP_NAME = 'ryde';
+        // ========================================================
+    // 🔥 FIREBASE CONFIGURATION (Replace here when you share new Firebase)
+    // ========================================================
     const firebaseConfig = {
       apiKey: "AIzaSyDKkWYavtCU1JE5JlvUXHSr90MqqisGtgM",
       authDomain: "maisonetoile-5eee1.firebaseapp.com",
@@ -2393,6 +2441,111 @@
       setTimeout(() => toast.classList.remove('show'), 2800);
     }
 
+    
+    // =================== RECEIPT PHOTO HANDLERS ===================
+    function handleReceiptFileUpload(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const maxDim = 960;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.78);
+
+          setAttachedReceipt(compressedDataUrl, file.name);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function setAttachedReceipt(url, label = 'Receipt image attached') {
+      const previewWrap = document.getElementById('saleReceiptPreviewWrap');
+      const previewImg = document.getElementById('saleReceiptPreviewImg');
+      const urlInput = document.getElementById('saleReceiptUrlInput');
+      const nameText = document.getElementById('saleReceiptFileName');
+
+      if (urlInput) urlInput.value = url;
+      if (previewImg) previewImg.src = url;
+      if (nameText) nameText.textContent = label;
+      if (previewWrap) previewWrap.style.display = 'flex';
+    }
+
+    function handleReceiptUrlInput(val) {
+      if (val && val.trim().startsWith('http')) {
+        setAttachedReceipt(val.trim(), 'Web Image URL');
+      } else if (!val.trim()) {
+        removeAttachedReceipt();
+      }
+    }
+
+    function removeAttachedReceipt() {
+      const fileInput = document.getElementById('saleReceiptFileInput');
+      const urlInput = document.getElementById('saleReceiptUrlInput');
+      const previewWrap = document.getElementById('saleReceiptPreviewWrap');
+      const previewImg = document.getElementById('saleReceiptPreviewImg');
+
+      if (fileInput) fileInput.value = '';
+      if (urlInput) urlInput.value = '';
+      if (previewImg) previewImg.src = '';
+      if (previewWrap) previewWrap.style.display = 'none';
+    }
+
+    function openReceiptModal(saleId) {
+      const sale = sales.find(s => String(s.id) === String(saleId));
+      if (!sale || !sale.receiptUrl) return;
+
+      const title = document.getElementById('receiptViewerTitle');
+      const sub = document.getElementById('receiptViewerSubtitle');
+      const img = document.getElementById('receiptViewerImg');
+      const link = document.getElementById('receiptDownloadLink');
+
+      if (title) title.textContent = `Receipt: ${sale.productName || 'Sale'}`;
+      if (sub) sub.textContent = `Buyer: ${sale.buyerUsername || '-'} • Amount: ${formatCurrency(sale.totalPrice)} • Sold by: ${sale.userName || '-'}`;
+      if (img) img.src = sale.receiptUrl;
+      if (link) link.href = sale.receiptUrl;
+
+      document.getElementById('receiptViewerModal').classList.add('show');
+    }
+
+    function closeReceiptModal() {
+      document.getElementById('receiptViewerModal').classList.remove('show');
+    }
+
+    function viewReceiptImageInViewer(src, label = 'Receipt Preview') {
+      const title = document.getElementById('receiptViewerTitle');
+      const sub = document.getElementById('receiptViewerSubtitle');
+      const img = document.getElementById('receiptViewerImg');
+      const link = document.getElementById('receiptDownloadLink');
+
+      if (title) title.textContent = label;
+      if (sub) sub.textContent = 'Preview of attached photo';
+      if (img) img.src = src;
+      if (link) link.href = src;
+
+      document.getElementById('receiptViewerModal').classList.add('show');
+    }
+
     // =================== STATE ===================
     let currentSession = null;
     let currentUsername = '';
@@ -2402,6 +2555,7 @@
     let products = [];
     let subscriptionProducts = [];
     let accounts = [];
+    let allSalesForTracking = [];
     let realAdmins = [];
     let editingSale = null;
     let commissionBrackets = [];
@@ -2417,7 +2571,7 @@
     }
 
     function applyShopConfig() {
-      const name = (shopConfig && shopConfig.shopName) ? shopConfig.shopName : 'Ryde';
+      const name = (shopConfig && shopConfig.shopName) ? shopConfig.shopName : 'SXO';
       document.title = `${name} — Sales Tracker`;
       const brandEl = document.querySelector('.brand-script');
       if (brandEl) brandEl.textContent = name;
@@ -2509,7 +2663,20 @@
       const displayName = (currentSession.customName || currentSession.username).replace(/^@/, '');
       document.getElementById('userName').textContent = displayName;
       document.getElementById('userRole').textContent = isOwner() ? 'Owner' : 'Admin';
-      document.getElementById('userAvatar').textContent = (displayName[0] || 'U').toUpperCase();
+      const clearBtn = document.getElementById('btnClearAll');
+      if (clearBtn && !isOwner()) clearBtn.style.display = 'none';
+      const userAv = currentSession.avatar || (users.find(u => u.username === currentUsername)?.avatar);
+      if (userAv) {
+        document.getElementById('userAvatar').innerHTML = `<img src="${userAv}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:9999px;">`;
+        if (document.getElementById('settingsAvatarPreview')) {
+          document.getElementById('settingsAvatarPreview').innerHTML = `<img src="${userAv}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;">`;
+        }
+      } else {
+        document.getElementById('userAvatar').textContent = (displayName[0] || 'U').toUpperCase();
+        if (document.getElementById('settingsAvatarPreview')) {
+          document.getElementById('settingsAvatarPreview').textContent = (displayName[0] || 'U').toUpperCase();
+        }
+      }
       document.getElementById('settingsDisplayName').value = displayName;
 
       // Adapt labels for Owner vs Admin (matching IMG_2338.MP4)
@@ -2678,8 +2845,12 @@
         if (snap.exists()) {
           settings = { ...settings, ...snap.val() };
           if (settings.avatar) {
-            document.getElementById('userAvatar').innerHTML = `<img src="${settings.avatar}" alt="Avatar">`;
+            document.getElementById('userAvatar').innerHTML = `<img src="${settings.avatar}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:9999px;">`;
             document.getElementById('settingsAvatarUrl').value = settings.avatar;
+            const prev = document.getElementById('settingsAvatarPreview');
+            if (prev) {
+              prev.innerHTML = `<img src="${settings.avatar}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;">`;
+            }
           }
         }
       });
@@ -2715,6 +2886,7 @@
             }
           });
           sales.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+          allSalesForTracking = sales;
           updateUI();
           updateNotifications();
         });
@@ -2733,9 +2905,35 @@
             sales.push(sale);
           });
           sales.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+          if (!allSalesForTracking || allSalesForTracking.length === 0) {
+            allSalesForTracking = sales;
+          }
           updateUI();
           updateNotifications();
         });
+
+        // Also listen to all sales for inventory tracking across admins
+        try {
+          getRef('sales').on('value', (snapshot) => {
+            const salesData = snapshot.val() || {};
+            const trackingSales = [];
+            Object.keys(salesData).forEach(uKey => {
+              const uSales = salesData[uKey];
+              if (uSales && typeof uSales === 'object') {
+                Object.keys(uSales).forEach(sKey => {
+                  const s = normalizeSaleRecord(uSales[sKey]);
+                  s.id = sKey;
+                  s.userKey = uKey;
+                  trackingSales.push(s);
+                });
+              }
+            });
+            allSalesForTracking = trackingSales;
+            renderInventoryDashboard();
+          });
+        } catch (e) {
+          console.warn('All sales inventory listener notice:', e);
+        }
       }
     }
 
@@ -2745,6 +2943,7 @@
       sale.price = Number(sale.price || sale.sellPrice) || 0;
       sale.totalPrice = Number(sale.totalPrice) || (sale.price * sale.quantity);
       sale.sold = sale.sold !== false;
+      sale.receiptUrl = rawSale.receiptUrl || null;
       const hasBuyPrice = sale.buyPrice !== undefined && sale.buyPrice !== null && sale.buyPrice !== '';
       let buyPrice = hasBuyPrice ? Number(sale.buyPrice) : NaN;
       if (isNaN(buyPrice)) {
@@ -3126,6 +3325,7 @@
       renderSalesTable();
       updateCharts();
       refreshPayoutViews();
+      renderInventoryDashboard();
     }
 
     // =================== UNIFIED COMMISSION ENGINE ===================
@@ -3252,6 +3452,13 @@
             <td style="font-weight:600;">${formatCurrency(sale.totalPrice)}</td>
             <td style="color:var(--primary); font-weight:500;">${formatCurrency(commTotal)}</td>
             <td>
+              ${sale.receiptUrl ? `
+                <button type="button" class="btn btn-sm btn-outline" onclick="openReceiptModal('${sale.id}')" style="display:inline-flex; align-items:center; gap:4px; padding:3px 8px; font-size:11px; white-space:nowrap; color:var(--primary); font-weight:600;" title="View payment receipt">
+                  🧾 Receipt
+                </button>
+              ` : '<span style="color:var(--muted-foreground); font-size:12px;">—</span>'}
+            </td>
+            <td>
               <button type="button" onclick="toggleSaleStatus('${sale.id}')" style="background:none; border:none; padding:0; cursor:pointer;" title="Click to toggle status">
                 <span class="badge ${sale.sold ? 'badge-verified' : 'badge-pending'}">
                   ${sale.sold ? 'Verified' : 'Pending'}
@@ -3288,11 +3495,14 @@
       document.getElementById('productDetailsCard').style.display = 'none';
       document.getElementById('totalEarningsCard').style.display = 'none';
       document.getElementById('profileTrackingFields').style.display = 'none';
+      const hint = document.getElementById('accountStockHint');
+      if (hint) {
+        hint.style.display = 'none';
+        hint.textContent = '';
+      }
+      populateAccountEmailDatalist();
       if (document.getElementById('saleDateInput')) {
         document.getElementById('saleDateInput').value = new Date().toISOString().split('T')[0];
-      }
-      if (document.getElementById('saleBuyPriceInput')) {
-        document.getElementById('saleBuyPriceInput').value = '';
       }
       if (document.getElementById('saleCustomCommissionInput')) {
         document.getElementById('saleCustomCommissionInput').value = '';
@@ -3302,6 +3512,7 @@
       }
       const submitBtn = document.querySelector('#addSaleForm button[type="submit"]');
       if (submitBtn) submitBtn.textContent = '+ Add Sale';
+      const ownerBox = document.getElementById('ownerSaleOverrides'); if (ownerBox) ownerBox.style.display = isOwner() ? 'block' : 'none';
       document.getElementById('saleModal').classList.add('show');
     }
 
@@ -3309,46 +3520,53 @@
       document.getElementById('saleModal').classList.remove('show');
     }
 
+    function getAllSubscriptionProducts() {
+      const map = new Map();
+      (subscriptionProducts || []).forEach(sp => {
+        if (sp && sp.id) map.set(String(sp.id), { ...sp });
+      });
+      (products || []).forEach(p => {
+        if (p && p.id && !map.has(String(p.id))) {
+          map.set(String(p.id), {
+            id: p.id,
+            name: p.name,
+            category: p.category || p.name,
+            soloPrice: p.sellPrice || 0,
+            sharedPrice: p.sellPrice || 0,
+            fullPrice: p.sellPrice || 0,
+            sellPrice: p.sellPrice || 0,
+            totalProfiles: p.totalProfiles || 5,
+            profiles: p.profiles || [],
+            isFromProducts: true
+          });
+        }
+      });
+      return Array.from(map.values());
+    }
+
     function findProductById(productId) {
-      return products.find(p => String(p.id) === String(productId)) ||
-             subscriptionProducts.find(p => String(p.id) === String(productId));
+      const allSubs = getAllSubscriptionProducts();
+      return allSubs.find(p => String(p.id) === String(productId));
     }
 
     function updateProductDropdown() {
       const select = document.getElementById('productSelect');
       if (!select) return;
-      select.innerHTML = '<option value="">-- Select Product --</option>';
+      select.innerHTML = '<option value="">-- Select Subscription Product --</option>';
 
-      const categories = {};
-      products.forEach(p => {
-        const cat = p.category || 'General';
-        if (!categories[cat]) categories[cat] = [];
-        categories[cat].push(p);
-      });
-
-      Object.keys(categories).sort().forEach(cat => {
-        const group = document.createElement('optgroup');
-        group.label = cat;
-        categories[cat].forEach(p => {
-          const opt = document.createElement('option');
-          opt.value = p.id;
-          opt.textContent = `${p.name} — ${formatCurrency(p.sellPrice)}`;
-          group.appendChild(opt);
-        });
-        select.appendChild(group);
-      });
-
-      if (subscriptionProducts.length > 0) {
-        const subGroup = document.createElement('optgroup');
-        subGroup.label = 'Subscriptions';
-        subscriptionProducts.forEach(sp => {
-          const opt = document.createElement('option');
-          opt.value = sp.id;
-          opt.textContent = `${sp.name} — ${formatCurrency(sp.soloPrice || sp.fullPrice)}`;
-          subGroup.appendChild(opt);
-        });
-        select.appendChild(subGroup);
+      const allSubs = getAllSubscriptionProducts();
+      if (allSubs.length === 0) {
+        select.innerHTML += '<option value="" disabled>No products added yet</option>';
+        return;
       }
+
+      allSubs.forEach(sp => {
+        const pPrice = Number(sp.soloPrice || sp.sellPrice || sp.fullPrice || sp.sharedPrice || 0);
+        const opt = document.createElement('option');
+        opt.value = sp.id;
+        opt.textContent = `${sp.name} — ${formatCurrency(pPrice)}`;
+        select.appendChild(opt);
+      });
     }
 
     document.getElementById('productSelect').addEventListener('change', function() {
@@ -3357,15 +3575,12 @@
       if (product) {
         const defaultPrice = product.sellPrice ?? product.soloPrice ?? product.fullPrice ?? 0;
         document.getElementById('productPriceInput').value = Number(defaultPrice).toFixed(2);
-        if (document.getElementById('saleBuyPriceInput')) {
-          document.getElementById('saleBuyPriceInput').value = Number(product.buyPrice || 0).toFixed(2);
-        }
       }
       displayProductDetails(productId);
       handleProductChangeForProfileTracking(productId);
     });
 
-    ['productQuantity', 'productPriceInput', 'saleBuyPriceInput', 'saleCustomCommissionInput', 'saleAssignedUserSelect'].forEach(id => {
+    ['productQuantity', 'productPriceInput', 'saleCustomCommissionInput', 'saleAssignedUserSelect'].forEach(id => {
       const el = document.getElementById(id);
       if (el) {
         el.addEventListener('input', () => displayProductDetails(document.getElementById('productSelect').value));
@@ -3395,16 +3610,11 @@
 
       const qty = parseInt(document.getElementById('productQuantity').value) || 1;
       const priceInput = document.getElementById('productPriceInput');
-      const buyInput = document.getElementById('saleBuyPriceInput');
       const customCommInput = document.getElementById('saleCustomCommissionInput');
 
-      const buyPrice = (isOwner() && buyInput && buyInput.value !== '')
-        ? (parseFloat(buyInput.value) || 0)
-        : (Number(product.buyPrice) || 0);
-      const baseSell = Number(product.sellPrice ?? product.soloPrice ?? product.fullPrice) || 0;
+      const baseSell = Number(product.soloPrice ?? product.sellPrice ?? product.fullPrice ?? product.sharedPrice) || 0;
       const userPrice = priceInput && priceInput.value ? parseFloat(priceInput.value) : baseSell;
 
-      const actualProfit = userPrice - buyPrice;
       const targetUser = getSelectedSaleTargetUser();
       const existingUserSales = getUserTotalVerifiedSales(targetUser);
       const projectedTotalSales = existingUserSales + (userPrice * qty);
@@ -3412,17 +3622,17 @@
         ? 100
         : getCommissionRateForProfit(projectedTotalSales, targetUser ? targetUser.id : null);
 
-      let unitEarn = calculateUnitCommission(product, userPrice, buyPrice, targetUser, projectedTotalSales);
+      let unitEarn = calculateUnitCommission(product, userPrice, 0, targetUser, projectedTotalSales);
       if (isOwner() && customCommInput && customCommInput.value !== '') {
         unitEarn = parseFloat(customCommInput.value) || 0;
       }
 
       document.getElementById('productPrice').textContent = formatCurrency(userPrice);
-      document.getElementById('productMargin').textContent = formatCurrency(actualProfit);
+      document.getElementById('productMargin').textContent = formatCurrency(userPrice);
       document.getElementById('productCommission').textContent = formatCurrency(unitEarn);
       document.getElementById('totalPrice').textContent = formatCurrency(userPrice * qty);
       const profitPreviewEl = document.getElementById('totalProfitPreview');
-      if (profitPreviewEl) profitPreviewEl.textContent = formatCurrency(actualProfit * qty);
+      if (profitPreviewEl) profitPreviewEl.textContent = formatCurrency(userPrice * qty);
       const ratePreviewEl = document.getElementById('previewRateLabel');
       if (ratePreviewEl) ratePreviewEl.textContent = `${activeRate}%`;
       document.getElementById('totalEarnings').textContent = formatCurrency(unitEarn * qty);
@@ -3431,28 +3641,104 @@
       document.getElementById('totalEarningsCard').style.display = 'block';
     }
 
+    function populateAccountEmailDatalist() {
+      const datalist = document.getElementById('accountEmailDatalist');
+      if (!datalist) return;
+      datalist.innerHTML = accounts.map(acc => {
+        const accSales = getAccountSalesList(acc);
+        const total = parseInt(acc.totalProfiles) || 5;
+        const sold = accSales.reduce((sum, s) => sum + (parseInt(s.quantity) || 1), 0);
+        const left = Math.max(0, total - sold);
+        return `<option value="${acc.id}">${acc.product} • ${left}/${total} slots available</option>`;
+      }).join('');
+    }
+
+    function checkAccountEmailStock() {
+      const emailInput = document.getElementById('accountEmailInput');
+      const hint = document.getElementById('accountStockHint');
+      const qtyInput = document.getElementById('productQuantity');
+      const accSelect = document.getElementById('accountIdSelect');
+      if (!emailInput || !hint) return;
+
+      const emailVal = emailInput.value.trim().toLowerCase();
+      if (!emailVal) {
+        hint.style.display = 'none';
+        return;
+      }
+
+      const matchedAcc = accounts.find(a => (a.id || '').trim().toLowerCase() === emailVal);
+      if (matchedAcc) {
+        if (accSelect) accSelect.value = matchedAcc.id;
+        const accSales = getAccountSalesList(matchedAcc);
+        const total = parseInt(matchedAcc.totalProfiles) || 5;
+        const sold = accSales.reduce((sum, s) => sum + (parseInt(s.quantity) || 1), 0);
+        const left = Math.max(0, total - sold);
+        const reqQty = parseInt(qtyInput?.value) || 1;
+
+        hint.style.display = 'block';
+        if (left <= 0) {
+          hint.style.color = 'var(--destructive)';
+          hint.textContent = `🔴 Account is Sold Out (0/${total} slots remaining)`;
+        } else if (reqQty > left) {
+          hint.style.color = 'var(--warning)';
+          hint.textContent = `⚠️ Only ${left} slot(s) remaining (you entered quantity: ${reqQty})`;
+        } else {
+          hint.style.color = 'var(--success)';
+          hint.textContent = `🟢 Account in stock: ${left} of ${total} slots remaining (${sold} sold)`;
+        }
+      } else {
+        hint.style.display = 'none';
+      }
+    }
+
     function handleProductChangeForProfileTracking(productId) {
       const product = findProductById(productId);
       const wrap = document.getElementById('profileTrackingFields');
-      if (!product) {
-        wrap.style.display = 'none';
+      const accSelect = document.getElementById('accountIdSelect');
+      if (!product || accounts.length === 0) {
+        if (wrap) wrap.style.display = 'none';
         return;
       }
-      const matchingAccounts = accounts.filter(acc => acc.product && product.category && acc.product.includes(product.category) && acc.status !== 'sold');
-      if (matchingAccounts.length > 0) {
+
+      // Smart match: check product name, category, or account product
+      const prodName = (product.name || '').toLowerCase();
+      const prodCat = (product.category || '').toLowerCase();
+
+      let matchingAccounts = accounts.filter(acc => {
+        const accProd = (acc.product || '').toLowerCase();
+        const accId = (acc.id || '').toLowerCase();
+        return (accProd && prodName.includes(accProd)) ||
+               (accProd && accProd.includes(prodName)) ||
+               (prodCat && accProd.includes(prodCat)) ||
+               (accId && prodName.includes(accId));
+      });
+
+      if (matchingAccounts.length === 0) {
+        matchingAccounts = accounts;
+      }
+
+      if (wrap && accSelect) {
         wrap.style.display = 'block';
-        const accSelect = document.getElementById('accountIdSelect');
-        accSelect.innerHTML = '<option value="">-- Direct Sale (No Account Slot) --</option>';
+        accSelect.innerHTML = '<option value="">-- Auto-link by Account Email or Select Below --</option>';
         matchingAccounts.forEach(acc => {
-          accSelect.innerHTML += `<option value="${acc.id}">${acc.id} - ${acc.product}</option>`;
+          const accSales = getAccountSalesList(acc);
+          const total = parseInt(acc.totalProfiles) || 5;
+          const sold = accSales.reduce((sum, s) => sum + (parseInt(s.quantity) || 1), 0);
+          const left = Math.max(0, total - sold);
+          accSelect.innerHTML += `<option value="${acc.id}">${acc.id} (${acc.product} • ${left}/${total} left)</option>`;
         });
-      } else {
-        wrap.style.display = 'none';
       }
     }
 
     function updateProfileStatus() {
       const accountId = document.getElementById('accountIdSelect').value;
+      if (accountId) {
+        const emailInput = document.getElementById('accountEmailInput');
+        if (emailInput) {
+          emailInput.value = accountId;
+        }
+        checkAccountEmailStock();
+      }
       const profileNumber = document.getElementById('profileNumberSelect').value;
       const profileType = document.querySelector('input[name="profileType"]:checked')?.value || 'Solo';
       const disp = document.getElementById('profileStatusDisplay');
@@ -3460,7 +3746,7 @@
         disp.style.display = 'none';
         return;
       }
-      const existingSales = sales.filter(s => s.accountId === accountId && s.profileNumber === parseInt(profileNumber));
+      const accIdLow = (accountId || '').toLowerCase(); const existingSales = sales.filter(s => (s.accountId === accountId || (s.accountEmail && s.accountEmail.toLowerCase() === accIdLow)) && s.profileNumber === parseInt(profileNumber));
       const maxSlots = profileType === 'Solo' ? 1 : 2;
       const filled = existingSales.length;
       document.getElementById('profileStatusText').textContent = `${filled}/${maxSlots} slots filled`;
@@ -3501,10 +3787,7 @@
       const quantity = parseInt(document.getElementById('productQuantity').value) || 1;
       const price = parseFloat(document.getElementById('productPriceInput').value) || Number(product.sellPrice || 0);
 
-      const buyInput = document.getElementById('saleBuyPriceInput');
-      const buyPrice = (isOwner() && buyInput && buyInput.value !== '')
-        ? (parseFloat(buyInput.value) || 0)
-        : (Number(product.buyPrice) || 0);
+      const buyPrice = 0;
 
       const targetUser = getSelectedSaleTargetUser();
       const targetUsername = targetUser ? targetUser.username : currentSession.username;
@@ -3524,7 +3807,11 @@
 
       const timestamp = Date.now();
       const saleId = isEditing ? editingSale.id : timestamp;
-      const accountId = document.getElementById('accountIdSelect').value || null;
+      let accountId = document.getElementById('accountIdSelect')?.value || null;
+      if (!accountId && accountEmail) {
+        const matchedAcc = accounts.find(a => (a.id || '').trim().toLowerCase() === accountEmail.toLowerCase());
+        if (matchedAcc) accountId = matchedAcc.id;
+      }
       const profileNumber = document.getElementById('profileNumberSelect').value ? parseInt(document.getElementById('profileNumberSelect').value) : null;
       const chosenDate = (isOwner() && document.getElementById('saleDateInput')?.value)
         ? document.getElementById('saleDateInput').value
@@ -3556,7 +3843,8 @@
         totalCommission: commissionAmount * quantity,
         sold: document.getElementById('productSoldStatus').value === 'yes',
         date: chosenDate,
-        timestamp: isEditing && editingSale.timestamp ? editingSale.timestamp : timestamp
+        timestamp: isEditing && editingSale.timestamp ? editingSale.timestamp : timestamp,
+        receiptUrl: document.getElementById('saleReceiptUrlInput')?.value.trim() || null
       };
 
       try {
@@ -3587,9 +3875,6 @@
       document.getElementById('productSoldStatus').value = sale.sold ? 'yes' : 'no';
 
       if (isOwner()) {
-        if (document.getElementById('saleBuyPriceInput')) {
-          document.getElementById('saleBuyPriceInput').value = Number(sale.buyPrice ?? 0).toFixed(2);
-        }
         if (document.getElementById('saleCustomCommissionInput')) {
           document.getElementById('saleCustomCommissionInput').value =
             (sale.customCommission !== undefined && sale.customCommission !== null)
@@ -3611,8 +3896,17 @@
       if (tRadio) tRadio.checked = true;
 
       displayProductDetails(sale.productId);
+      handleProductChangeForProfileTracking(sale.productId);
+      if (sale.accountId && document.getElementById('accountIdSelect')) {
+        document.getElementById('accountIdSelect').value = sale.accountId;
+      }
+      if (sale.profileNumber && document.getElementById('profileNumberSelect')) {
+        document.getElementById('profileNumberSelect').value = sale.profileNumber;
+      }
+      checkAccountEmailStock();
       const submitBtn = document.querySelector('#addSaleForm button[type="submit"]');
       if (submitBtn) submitBtn.textContent = 'Save Changes';
+      const ownerBox = document.getElementById('ownerSaleOverrides'); if (ownerBox) ownerBox.style.display = isOwner() ? 'block' : 'none';
       document.getElementById('saleModal').classList.add('show');
     }
 
@@ -3647,14 +3941,17 @@
       const tbody = document.getElementById('bulkSalesTableBody');
       const tr = document.createElement('tr');
       tr.id = `bulk-row-${rowId}`;
-      const opts = products.map(p => `<option value="${p.id}" data-buy="${p.buyPrice}" data-sell="${p.sellPrice}">${p.name}</option>`).join('');
+      const listToDisplay = (subscriptionProducts && subscriptionProducts.length > 0) ? subscriptionProducts : products;
+      const opts = listToDisplay.map(p => {
+        const sPrice = p.soloPrice || p.sellPrice || p.fullPrice || 0;
+        return `<option value="${p.id}" data-sell="${sPrice}">${p.name}</option>`;
+      }).join('');
       tr.innerHTML = `
         <td><select class="select-control bulk-product" onchange="updateBulkRowDetails(${rowId})"><option value="">-- Select --</option>${opts}</select></td>
         <td><select class="select-control bulk-account-type"><option value="Solo">Solo</option><option value="Shared">Shared</option></select></td>
         <td><select class="select-control bulk-warranty"><option value="FW">FW</option><option value="NW">NW</option></select></td>
         <td><input type="text" class="input-control bulk-username" placeholder="@buyer"></td>
         <td><input type="email" class="input-control bulk-email" placeholder="email@..."></td>
-        <td><input type="number" class="input-control bulk-buy" style="width:80px;" step="0.01"></td>
         <td><input type="number" class="input-control bulk-sell" style="width:80px;" step="0.01"></td>
         <td><input type="number" class="input-control bulk-qty" style="width:65px;" value="1" min="1"></td>
         <td><select class="select-control bulk-status"><option value="yes">Sold</option><option value="no">Stock</option></select></td>
@@ -3675,7 +3972,6 @@
       const sel = row.querySelector('.bulk-product');
       const opt = sel.options[sel.selectedIndex];
       if (opt && opt.value) {
-        row.querySelector('.bulk-buy').value = opt.dataset.buy || 0;
         row.querySelector('.bulk-sell').value = opt.dataset.sell || 0;
       }
     }
@@ -3703,6 +3999,13 @@
         const qty = parseInt(row.querySelector('.bulk-qty').value) || 1;
         const comm = calculateUnitCommission(product, price, buyPrice, currentSession);
         const saleId = Date.now() + saved;
+        const bulkBuyer = row.querySelector('.bulk-username').value.trim() || '-';
+        const bulkEmail = row.querySelector('.bulk-email').value.trim() || '-';
+        let bulkAccId = null;
+        if (bulkEmail && bulkEmail !== '-') {
+          const matchedAcc = accounts.find(a => (a.id || '').trim().toLowerCase() === bulkEmail.toLowerCase());
+          if (matchedAcc) bulkAccId = matchedAcc.id;
+        }
         await getRef(`sales/${userKey}/${saleId}`).set({
           id: saleId,
           userId: currentSession.id,
@@ -3713,8 +4016,9 @@
           recordedBy: currentSession.username,
           productId,
           productName: product ? product.name : 'Product',
-          buyerUsername: row.querySelector('.bulk-username').value.trim() || '-',
-          accountEmail: row.querySelector('.bulk-email').value.trim() || '-',
+          buyerUsername: bulkBuyer,
+          accountEmail: bulkEmail,
+          accountId: bulkAccId,
           warranty: row.querySelector('.bulk-warranty').value,
           accountType: row.querySelector('.bulk-account-type').value,
           quantity: qty,
@@ -3743,10 +4047,8 @@
 
     // =================== PRODUCTS VIEW ===================
     function switchProductTab(tab) {
-      document.getElementById('tabRegularProducts').classList.toggle('active', tab === 'regular');
-      document.getElementById('tabSubProducts').classList.toggle('active', tab === 'subscription');
-      document.getElementById('regularProductsPane').style.display = tab === 'regular' ? 'block' : 'none';
-      document.getElementById('subscriptionProductsPane').style.display = tab === 'subscription' ? 'block' : 'none';
+      const subPane = document.getElementById('subscriptionProductsPane');
+      if (subPane) subPane.style.display = 'block';
     }
 
     function openAddProductModal() { document.getElementById('addProductModal').classList.add('show'); }
@@ -3780,7 +4082,7 @@
       e.preventDefault();
       if (!isOwner()) return;
       const name = document.getElementById('subProductName').value.trim();
-      const buyPrice = parseFloat(document.getElementById('subBuyPrice').value) || 0;
+      const buyPrice = 0;
       const fullPrice = parseFloat(document.getElementById('subFullPrice').value) || 0;
       const soloPrice = parseFloat(document.getElementById('subSoloPrice').value) || 0;
       const sharedPrice = parseFloat(document.getElementById('subSharedPrice').value) || 0;
@@ -3802,67 +4104,7 @@
     });
 
     function renderProductList() {
-      const container = document.getElementById('productList');
-      if (!container) return;
-      const q = (document.getElementById('productSearch')?.value || '').toLowerCase();
-      const filtered = products.filter(p => p.name.toLowerCase().includes(q) || (p.category || '').toLowerCase().includes(q));
-
-      if (filtered.length === 0) {
-        container.innerHTML = `<div class="empty-box" style="grid-column:1/-1;"><p>No matching products</p></div>`;
-        return;
-      }
-
-      const mySalesTotal = !isOwner() ? Math.max(getUserTotalVerifiedSales(currentSession), 1) : 1;
-
-      container.innerHTML = filtered.map(product => {
-        const buy = Number(product.buyPrice) || 0;
-        const sell = Number(product.sellPrice) || 0;
-        const profit = Math.max(sell - buy, 0);
-        const rate = getCommissionRateForProfit(isOwner() ? sell : mySalesTotal, currentSession?.id);
-        let adminEarns = profit * (rate / 100);
-        let commLabel = `Salary (${rate}% of Profit)`;
-        if (product.commType === 'fixed' && product.commValue > 0) {
-          adminEarns = Number(product.commValue);
-          commLabel = `Fixed Salary`;
-        } else if (product.commType === 'percent' && product.commValue > 0) {
-          adminEarns = (profit * Number(product.commValue)) / 100;
-          commLabel = `Custom (${product.commValue}% of Profit)`;
-        }
-        return `
-          <div class="item-card">
-            <div class="item-card-header">
-              <div>
-                <div class="item-card-title">${product.name}</div>
-                <div class="item-card-sub">${product.category || 'General'}</div>
-              </div>
-              ${isOwner() ? `
-                <div style="display:flex; gap:4px;">
-                  <button class="btn btn-sm btn-outline" onclick="editProduct('${product.id}')">Edit</button>
-                  <button class="btn btn-sm btn-danger" onclick="deleteProduct('${product.id}')">✕</button>
-                </div>
-              ` : `<span class="badge badge-primary">${formatCurrency(adminEarns)} Salary</span>`}
-            </div>
-            <div class="metrics-mini-grid">
-              <div>
-                <div class="metric-mini-label">Sell Price</div>
-                <div class="metric-mini-val">${formatCurrency(sell)}</div>
-              </div>
-              <div>
-                <div class="metric-mini-label">Cost / Capital</div>
-                <div class="metric-mini-val">${formatCurrency(buy)}</div>
-              </div>
-              <div>
-                <div class="metric-mini-label">Profit (Sale–Cap)</div>
-                <div class="metric-mini-val" style="color:var(--success);">${formatCurrency(profit)}</div>
-              </div>
-              <div>
-                <div class="metric-mini-label">${commLabel}</div>
-                <div class="metric-mini-val" style="color:var(--primary);">${formatCurrency(adminEarns)}</div>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
+      renderSubscriptionProducts();
     }
 
     function sortProducts(sortBy) {
@@ -3930,31 +4172,51 @@
     function renderSubscriptionProducts() {
       const container = document.getElementById('subscriptionProductList');
       if (!container) return;
-      if (subscriptionProducts.length === 0) {
-        container.innerHTML = `<div class="empty-box" style="grid-column:1/-1;"><p>No subscription products yet</p></div>`;
+      const allSubs = getAllSubscriptionProducts();
+      if (allSubs.length === 0) {
+        container.innerHTML = `
+          <div class="panel-card" style="grid-column:1/-1;">
+            <div class="empty-box">
+              <h4>No Subscription Products</h4>
+              <p>Add subscription services (e.g. Netflix, ChatGPT) to sell and track slots.</p>
+              ${isOwner() ? '<button class="btn btn-primary" onclick="openAddSubscriptionModal()">+ Add First Subscription</button>' : ''}
+            </div>
+          </div>
+        `;
         return;
       }
-      container.innerHTML = subscriptionProducts.map(p => {
+      container.innerHTML = allSubs.map(p => {
         const avail = (p.profiles || []).filter(pr => !pr.sold).length;
+        const solo = p.soloPrice || p.sellPrice || 0;
+        const shared = p.sharedPrice || p.sellPrice || 0;
+        const full = p.fullPrice || p.sellPrice || 0;
         return `
           <div class="item-card">
             <div class="item-card-header">
               <div>
                 <div class="item-card-title">${p.name}</div>
-                <div class="item-card-sub">${avail}/${p.totalProfiles} profiles available</div>
+                <div class="item-card-sub">${p.totalProfiles || 5} profiles capacity</div>
               </div>
               ${isOwner() ? `
-                <div style="display:flex; gap:4px;">
+                <div style="display:flex; gap:6px;">
                   <button class="btn btn-sm btn-outline" onclick="editSubscriptionProduct('${p.id}')">Edit</button>
                   <button class="btn btn-sm btn-danger" onclick="deleteSubscriptionProduct('${p.id}')">✕</button>
                 </div>
               ` : ''}
             </div>
-            <div class="metrics-mini-grid">
-              <div><div class="metric-mini-label">Full</div><div class="metric-mini-val">${formatCurrency(p.fullPrice)}</div></div>
-              <div><div class="metric-mini-label">Solo</div><div class="metric-mini-val">${formatCurrency(p.soloPrice)}</div></div>
-              <div><div class="metric-mini-label">Shared</div><div class="metric-mini-val">${formatCurrency(p.sharedPrice)}</div></div>
-              <div><div class="metric-mini-label">Cost</div><div class="metric-mini-val">${formatCurrency(p.buyPrice)}</div></div>
+            <div class="metrics-mini-grid" style="grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 8px;">
+              <div>
+                <div class="metric-mini-label">Solo Profile</div>
+                <div class="metric-mini-val" style="color:var(--primary); font-weight:700;">${formatCurrency(solo)}</div>
+              </div>
+              <div>
+                <div class="metric-mini-label">Shared Profile</div>
+                <div class="metric-mini-val" style="color:var(--success); font-weight:700;">${formatCurrency(shared)}</div>
+              </div>
+              <div>
+                <div class="metric-mini-label">Full Account</div>
+                <div class="metric-mini-val" style="font-weight:700;">${formatCurrency(full)}</div>
+              </div>
             </div>
           </div>
         `;
@@ -3967,11 +4229,10 @@
       if (!p) return;
       document.getElementById('editSubProductId').value = p.id;
       document.getElementById('editSubProductName').value = p.name;
-      document.getElementById('editSubBuyPrice').value = p.buyPrice;
-      document.getElementById('editSubFullPrice').value = p.fullPrice;
-      document.getElementById('editSubSoloPrice').value = p.soloPrice;
-      document.getElementById('editSubSharedPrice').value = p.sharedPrice;
-      document.getElementById('editSubTotalProfiles').value = p.totalProfiles;
+      document.getElementById('editSubFullPrice').value = p.fullPrice || 0;
+      document.getElementById('editSubSoloPrice').value = p.soloPrice || 0;
+      document.getElementById('editSubSharedPrice').value = p.sharedPrice || 0;
+      document.getElementById('editSubTotalProfiles').value = p.totalProfiles || 5;
       document.getElementById('editSubscriptionModal').classList.add('show');
     }
     function closeEditSubscriptionModal() { document.getElementById('editSubscriptionModal').classList.remove('show'); }
@@ -3986,17 +4247,26 @@
       while (profiles.length < newTotal) {
         profiles.push({ number: profiles.length + 1, sold: false, soldBy: '', soldDate: '' });
       }
+      const name = document.getElementById('editSubProductName').value.trim();
+      const fullPrice = parseFloat(document.getElementById('editSubFullPrice').value) || 0;
+      const soloPrice = parseFloat(document.getElementById('editSubSoloPrice').value) || 0;
+      const sharedPrice = parseFloat(document.getElementById('editSubSharedPrice').value) || 0;
+
       const updated = {
         ...existing,
-        name: document.getElementById('editSubProductName').value.trim(),
-        buyPrice: parseFloat(document.getElementById('editSubBuyPrice').value) || 0,
-        fullPrice: parseFloat(document.getElementById('editSubFullPrice').value) || 0,
-        soloPrice: parseFloat(document.getElementById('editSubSoloPrice').value) || 0,
-        sharedPrice: parseFloat(document.getElementById('editSubSharedPrice').value) || 0,
+        name,
+        category: name,
+        buyPrice: 0,
+        fullPrice,
+        soloPrice,
+        sharedPrice,
+        sellPrice: soloPrice || fullPrice || sharedPrice,
         totalProfiles: newTotal,
         profiles: profiles.slice(0, newTotal)
       };
+      showSyncingIndicator();
       getRef('subscriptionProducts/' + id).update(updated).then(() => {
+        ensureAppInList(name);
         closeEditSubscriptionModal();
         showToast('Subscription updated!');
       });
@@ -4007,12 +4277,168 @@
       getRef('subscriptionProducts/' + id).remove().then(() => showToast('Deleted'));
     }
 
+    
+    // =================== APPS & SERVICES STATE ===================
+    let defaultAppsList = ['ChatGPT', 'Netflix', 'Spotify', 'Canva', 'YouTube', 'Disney+', 'Prime Video', 'HBO Max', 'VIU', 'Vivamax', 'CapCut'];
+    let shopApps = [...defaultAppsList];
+
+    function ensureAppInList(appName) {
+      if (!appName) return;
+      const clean = appName.trim();
+      if (!clean) return;
+      if (!shopApps.some(a => a.toLowerCase() === clean.toLowerCase())) {
+        shopApps.push(clean);
+        if (isOwner()) {
+          getRef('settings/appsList').set(shopApps);
+        }
+        renderAppsInDropdowns();
+      }
+    }
+
+    function renderAppsInDropdowns(selectedVal = '') {
+      // 1. Datalist for inputs
+      const datalist = document.getElementById('shopAppsDatalist');
+      if (datalist) {
+        datalist.innerHTML = shopApps.map(app => `<option value="${app}">${app}</option>`).join('');
+      }
+
+      // 2. Account service select in Account Tracker Modal
+      const sel = document.getElementById('accountProductSelect');
+      if (sel) {
+        let opts = `<option value="">-- Select App / Service --</option>`;
+        shopApps.forEach(app => {
+          opts += `<option value="${app}">${app}</option>`;
+        });
+        opts += `<option value="__custom__">➕ + Custom App / Type Name...</option>`;
+        sel.innerHTML = opts;
+        if (selectedVal) {
+          if (!shopApps.includes(selectedVal)) {
+            sel.innerHTML = `<option value="${selectedVal}">${selectedVal}</option>` + sel.innerHTML;
+          }
+          sel.value = selectedVal;
+        }
+      }
+
+      // 3. Chips container in Manage Apps Modal
+      const chips = document.getElementById('appsChipsContainer');
+      if (chips) {
+        chips.innerHTML = shopApps.map(app => `
+          <div style="display:inline-flex; align-items:center; gap:6px; background:var(--card); border:1px solid var(--border); border-radius:9999px; padding:4px 10px; font-size:12px; font-weight:500;">
+            <span>${app}</span>
+            ${isOwner() ? `<button type="button" onclick="deleteAppFromModal('${app}')" style="background:none; border:none; cursor:pointer; color:var(--destructive); font-size:13px; padding:0; line-height:1;" title="Delete app">✕</button>` : ''}
+          </div>
+        `).join('');
+      }
+    }
+
+    function openManageAppsModal() {
+      renderAppsInDropdowns();
+      document.getElementById('manageAppsModal').classList.add('show');
+      const input = document.getElementById('newAppNameInput');
+      if (input) { input.value = ''; setTimeout(() => input.focus(), 80); }
+    }
+
+    function closeManageAppsModal() {
+      document.getElementById('manageAppsModal').classList.remove('show');
+    }
+
+    function addNewAppFromModal() {
+      const input = document.getElementById('newAppNameInput');
+      if (!input) return;
+      const val = input.value.trim();
+      if (!val) {
+        showToast('Enter an app name', 'error');
+        return;
+      }
+      if (shopApps.some(a => a.toLowerCase() === val.toLowerCase())) {
+        showToast('App already exists in list');
+        input.value = '';
+        return;
+      }
+      shopApps.push(val);
+      getRef('settings/appsList').set(shopApps).then(() => {
+        showToast(`Added ${val}!`);
+        input.value = '';
+        renderAppsInDropdowns();
+      });
+    }
+
+    function deleteAppFromModal(appName) {
+      if (!isOwner()) return;
+      if (!confirm(`Remove ${appName} from apps list?`)) return;
+      shopApps = shopApps.filter(a => a !== appName);
+      if (shopApps.length === 0) shopApps = [...defaultAppsList];
+      getRef('settings/appsList').set(shopApps).then(() => {
+        showToast(`Removed ${appName}`);
+        renderAppsInDropdowns();
+      });
+    }
+
+    function toggleCustomAppInput() {
+      const sel = document.getElementById('accountProductSelect');
+      const customInp = document.getElementById('customAppInput');
+      const btn = document.getElementById('btnToggleCustomApp');
+      if (!customInp || !sel) return;
+
+      const isShowingCustom = customInp.style.display !== 'none';
+      if (isShowingCustom) {
+        customInp.style.display = 'none';
+        sel.style.display = 'block';
+        if (btn) btn.textContent = '✏️ Custom';
+      } else {
+        customInp.style.display = 'block';
+        sel.style.display = 'none';
+        customInp.value = sel.value && sel.value !== '__custom__' ? sel.value : '';
+        customInp.focus();
+        if (btn) btn.textContent = '📋 List';
+      }
+    }
+
+    function onAccountAppSelectChange(val) {
+      if (val === '__custom__') {
+        const sel = document.getElementById('accountProductSelect');
+        const customInp = document.getElementById('customAppInput');
+        const btn = document.getElementById('btnToggleCustomApp');
+        if (sel && customInp) {
+          sel.style.display = 'none';
+          customInp.style.display = 'block';
+          customInp.value = '';
+          customInp.focus();
+          if (btn) btn.textContent = '📋 List';
+        }
+      }
+    }
+
     // =================== ACCOUNT TRACKER ===================
+    function populateAccountProductOptions(selectedVal = '') {
+      const sel = document.getElementById('accountProductSelect');
+      if (!sel) return;
+      const standard = ['Netflix', 'Disney+', 'HBO Max', 'YouTube', 'Prime Video', 'Spotify', 'Canva', 'ChatGPT', 'VIU', 'Vivamax'];
+      const set = new Set([...standard]);
+      (products || []).forEach(p => {
+        if (p.name) set.add(p.name);
+        if (p.category) set.add(p.category);
+      });
+      (subscriptionProducts || []).forEach(sp => {
+        if (sp.name) set.add(sp.name);
+      });
+      if (selectedVal) set.add(selectedVal);
+      sel.innerHTML = Array.from(set).map(opt => `<option value="${opt}">${opt}</option>`).join('');
+      if (selectedVal) sel.value = selectedVal;
+    }
+
     function openAccountManagementModal() {
       document.getElementById('editingAccountOriginalKey').value = '';
       document.getElementById('accountModalTitle').textContent = 'Add Streaming Account';
       document.getElementById('accountModalSubmitBtn').textContent = 'Create Account';
       document.getElementById('createAccountForm').reset();
+      const customInp = document.getElementById('customAppInput');
+      const sel = document.getElementById('accountProductSelect');
+      const btn = document.getElementById('btnToggleCustomApp');
+      if (customInp) customInp.style.display = 'none';
+      if (sel) sel.style.display = 'block';
+      if (btn) btn.textContent = '✏️ Custom';
+      renderAppsInDropdowns();
       document.getElementById('accountManagementModal').classList.add('show');
     }
     function closeAccountManagementModal() { document.getElementById('accountManagementModal').classList.remove('show'); }
@@ -4024,7 +4450,13 @@
       document.getElementById('accountModalTitle').textContent = 'Edit Streaming Account';
       document.getElementById('accountModalSubmitBtn').textContent = 'Save Changes';
       document.getElementById('accountIdInput').value = acc.id;
-      document.getElementById('accountProductSelect').value = acc.product || 'Netflix';
+      const customInp = document.getElementById('customAppInput');
+      const sel = document.getElementById('accountProductSelect');
+      const btn = document.getElementById('btnToggleCustomApp');
+      if (customInp) customInp.style.display = 'none';
+      if (sel) sel.style.display = 'block';
+      if (btn) btn.textContent = '✏️ Custom';
+      renderAppsInDropdowns(acc.product || 'ChatGPT');
       document.getElementById('accountStatus').value = acc.status || 'stock';
       document.getElementById('accountProfilesInput').value = acc.totalProfiles || 5;
       const pType = acc.profileType || 'solo';
@@ -4040,7 +4472,14 @@
       if (!accountId) return;
       const newKey = sanitizeUserKey(accountId);
       const status = document.getElementById('accountStatus').value || 'stock';
-      const product = document.getElementById('accountProductSelect').value;
+
+      const customInp = document.getElementById('customAppInput');
+      const sel = document.getElementById('accountProductSelect');
+      let product = (customInp && customInp.style.display !== 'none' && customInp.value.trim())
+        ? customInp.value.trim()
+        : (sel ? sel.value : 'ChatGPT');
+      if (product === '__custom__') product = 'ChatGPT';
+
       const totalProfiles = parseInt(document.getElementById('accountProfilesInput').value) || 5;
       const profileType = document.querySelector('input[name="accountProfileType"]:checked')?.value || 'solo';
       const slotsPerProfile = profileType === 'solo' ? 1 : 2;
@@ -4059,8 +4498,24 @@
         createdDate: new Date().toISOString().split('T')[0],
         createdBy: currentSession.username
       });
+
+      ensureAppInList(product);
       closeAccountManagementModal();
       showToast(origKey ? 'Account updated!' : 'Account added!');
+    }
+
+    function getAccountSalesList(account) {
+      if (!account || !account.id) return [];
+      const accIdNorm = (account.id || '').trim().toLowerCase();
+      const listToScan = (typeof allSalesForTracking !== 'undefined' && Array.isArray(allSalesForTracking) && allSalesForTracking.length > 0)
+        ? allSalesForTracking
+        : sales;
+      return listToScan.filter(s => {
+        if (!s) return false;
+        const sAccId = (s.accountId || '').trim().toLowerCase();
+        const sAccEmail = (s.accountEmail || '').trim().toLowerCase();
+        return (sAccId && sAccId === accIdNorm) || (sAccEmail && sAccEmail === accIdNorm);
+      });
     }
 
     function renderInventoryDashboard() {
@@ -4080,35 +4535,49 @@
       }
 
       container.innerHTML = accounts.map(account => {
-        const accountSales = sales.filter(s => s.accountId === account.id);
-        const totalRevenue = accountSales.reduce((sum, s) => sum + (Number(s.totalPrice) || 0), 0);
-        const isSold = account.status === 'sold';
+        const accountSales = getAccountSalesList(account);
+        const totalRevenue = accountSales.reduce((sum, s) => sum + (Number(s.totalPrice) || (Number(s.price || 0) * (parseInt(s.quantity) || 1))), 0);
+        const totalProfiles = parseInt(account.totalProfiles) || 5;
+        const slotsSold = accountSales.reduce((sum, s) => sum + (parseInt(s.quantity) || 1), 0);
+        const slotsRemaining = Math.max(0, totalProfiles - slotsSold);
+        const isSoldOut = slotsRemaining === 0 || account.status === 'sold';
+
         return `
           <div class="item-card">
             <div class="item-card-header">
               <div>
                 <div class="item-card-title">${account.id}</div>
-                <div class="item-card-sub">${account.product} • ${account.profileType || 'solo'} (${account.totalProfiles || 5} profiles)</div>
+                <div class="item-card-sub">${account.product} • ${account.profileType || 'solo'} (${totalProfiles} profiles)</div>
               </div>
               <div style="display:flex; align-items:center; gap:6px;">
-                <span class="badge ${isSold ? 'badge-pending' : 'badge-verified'}">${isSold ? 'Sold' : 'In Stock'}</span>
+                <span class="badge ${isSoldOut ? 'badge-pending' : 'badge-verified'}">
+                  ${isSoldOut ? 'Sold Out' : 'In Stock'} (${slotsRemaining}/${totalProfiles} left)
+                </span>
                 <button class="btn btn-sm btn-outline" onclick="editAccount('${account.id}')">Edit</button>
                 ${isOwner() ? `<button class="btn btn-sm btn-danger" onclick="deleteAccount('${account.id}')">✕</button>` : ''}
               </div>
             </div>
-            <div class="metrics-mini-grid">
+            <div class="metrics-mini-grid" style="grid-template-columns: repeat(3, 1fr); gap: 8px;">
               <div>
                 <div class="metric-mini-label">Slots Sold</div>
-                <div class="metric-mini-val">${accountSales.length}</div>
+                <div class="metric-mini-val" style="color:var(--primary); font-weight:700;">${slotsSold} / ${totalProfiles}</div>
+              </div>
+              <div>
+                <div class="metric-mini-label">Available Stock</div>
+                <div class="metric-mini-val" style="color:${slotsRemaining > 0 ? 'var(--success)' : 'var(--destructive)'}; font-weight:700;">
+                  ${slotsRemaining} ${slotsRemaining === 1 ? 'slot' : 'slots'}
+                </div>
               </div>
               <div>
                 <div class="metric-mini-label">Revenue</div>
-                <div class="metric-mini-val">${formatCurrency(totalRevenue)}</div>
+                <div class="metric-mini-val" style="font-weight:700;">${formatCurrency(totalRevenue)}</div>
               </div>
             </div>
           </div>
         `;
       }).join('');
+
+      populateAccountEmailDatalist();
     }
 
     function deleteAccount(accountId) {
@@ -4553,13 +5022,20 @@
         const displayName = (user.customName || user.username || 'User').replace(/^@/, '');
         const roleBadge = (user.role || 'admin').toLowerCase() === 'owner' ? 'Owner' : 'Admin';
         const pinHint = user.plainPassword ? ` • PIN: ${user.plainPassword}` : '';
+        const userAv = user.avatar;
+        const avHtml = userAv 
+          ? `<img src="${userAv}" alt="${displayName}" style="width:38px;height:38px;border-radius:9999px;object-fit:cover;border:1px solid var(--border);flex-shrink:0;">` 
+          : `<div style="width:38px;height:38px;border-radius:9999px;background:var(--primary-soft);color:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;flex-shrink:0;">${(displayName[0]||'U').toUpperCase()}</div>`;
 
         return `
           <div class="item-card">
             <div class="item-card-header">
-              <div>
-                <div class="item-card-title">${displayName} <span class="badge badge-secondary" style="margin-left:4px;">${roleBadge}</span></div>
-                <div class="item-card-sub">@${(user.username || '').replace(/^@/, '')} • ${modeLabel}${pinHint}</div>
+              <div style="display:flex; align-items:center; gap:10px;">
+                ${avHtml}
+                <div>
+                  <div class="item-card-title">${displayName} <span class="badge badge-secondary" style="margin-left:4px;">${roleBadge}</span></div>
+                  <div class="item-card-sub">@${(user.username || '').replace(/^@/, '')} • ${modeLabel}${pinHint}</div>
+                </div>
               </div>
               <div style="display:flex; gap:4px;">
                 <button class="btn btn-sm btn-outline" onclick="openEditCommissionModal('${user.id}')">Edit</button>
@@ -4592,6 +5068,12 @@
         document.getElementById('editUserCommModeSelect').value = mode;
       }
       document.getElementById('editProfitPercent').value = user.profitPercent ?? 20;
+      const avUrl = user.avatar || '';
+      if (document.getElementById('editUserAvatarUrl')) document.getElementById('editUserAvatarUrl').value = avUrl;
+      const avPrev = document.getElementById('editUserAvatarPreview');
+      if (avPrev) {
+        avPrev.innerHTML = avUrl ? `<img src="${avUrl}" style="width:100%;height:100%;object-fit:cover;">` : (user.customName || user.username || 'U')[0].toUpperCase();
+      }
       toggleEditUserCommFields();
       document.getElementById('editCommissionModal').classList.add('show');
     }
@@ -4609,7 +5091,9 @@
       const profitPercent = commissionMode !== 'bracket' ? (parseFloat(document.getElementById('editProfitPercent').value) || 0) : 20;
       const key = user.key || sanitizeUserKey(user.username);
 
-      const updates = { customName, role, commissionMode, profitPercent };
+      const avatar = document.getElementById('editUserAvatarUrl')?.value.trim() || user.avatar || '';
+      const updates = { customName, role, commissionMode, profitPercent, avatar };
+      getRef('settings/' + key).update({ avatar });
       if (newPass) {
         updates.password = hashPassword(newPass);
         updates.plainPassword = newPass;
@@ -4644,10 +5128,18 @@
       }
 
       showSyncingIndicator();
+      if (avatarUrl !== undefined) {
+        updates.avatar = avatarUrl;
+      }
       await getRef('users/' + safeKey).update(updates);
       await getRef('settings/' + safeKey).update({ avatar: avatarUrl });
 
       currentSession.customName = newName;
+      if (avatarUrl) currentSession.avatar = avatarUrl;
+      const avTarget = document.getElementById('userAvatar');
+      if (avTarget) {
+        avTarget.innerHTML = avatarUrl ? `<img src="${avatarUrl}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:9999px;">` : (newName[0] || 'U').toUpperCase();
+      }
       localStorage.setItem('session', JSON.stringify(currentSession));
       document.getElementById('userName').textContent = newName;
       document.getElementById('dashboardSubtitle').textContent = `Welcome back, ${newName}`;
@@ -4658,7 +5150,7 @@
     document.getElementById('ownerShopSettingsForm').addEventListener('submit', async function(e) {
       e.preventDefault();
       if (!isOwner()) return;
-      const shopName = document.getElementById('settingsShopName').value.trim() || 'Ryde';
+      const shopName = document.getElementById('settingsShopName').value.trim() || 'SXO';
       const currency = document.getElementById('settingsCurrencySymbol').value.trim() || '₱';
       const defaultRate = parseFloat(document.getElementById('settingsDefaultRate').value) || 20;
       showSyncingIndicator();
@@ -4686,10 +5178,12 @@
     }
 
     function clearAllData() {
-      if (!confirm('Are you sure you want to delete sales data? This cannot be undone.')) return;
-      const userKey = sanitizeUserKey(currentSession.username);
-      const target = isOwner() ? getRef('sales') : getRef('sales/' + userKey);
-      target.remove().then(() => showToast('Sales data cleared'));
+      if (!isOwner()) {
+        showToast('Only owners can clear sales data', 'error');
+        return;
+      }
+      if (!confirm('Are you sure you want to delete all sales data? This cannot be undone.')) return;
+      getRef('sales').remove().then(() => showToast('Sales data cleared'));
     }
 
     // Event Listeners
@@ -4724,6 +5218,99 @@
         loadAllData();
       }
     });
-  </script>
+  
+    // Client-side image compression: Scales phone & PC photos to clean avatar thumbnails (< 35KB)
+    function compressImageForAvatar(file, maxDim, quality, callback) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          let w = img.width;
+          let h = img.height;
+          if (w > h) {
+            if (w > maxDim) { h = Math.round((h * maxDim) / w); w = maxDim; }
+          } else {
+            if (h > maxDim) { w = Math.round((w * maxDim) / h); h = maxDim; }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          const dataUrl = canvas.toDataURL('image/jpeg', quality);
+          callback(dataUrl);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function setupAvatarFileInput(fileInputId, urlInputId, previewId) {
+      const fileInput = document.getElementById(fileInputId);
+      const urlInput = document.getElementById(urlInputId);
+      const preview = document.getElementById(previewId);
+      if (fileInput) {
+        fileInput.addEventListener('change', (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+          compressImageForAvatar(file, 256, 0.86, (compressedDataUrl) => {
+            if (urlInput) urlInput.value = compressedDataUrl;
+            if (preview) {
+              preview.innerHTML = `<img src="${compressedDataUrl}" style="width:100%;height:100%;object-fit:cover;">`;
+            }
+          });
+        });
+      }
+      if (urlInput && preview) {
+        urlInput.addEventListener('input', (e) => {
+          const val = e.target.value.trim();
+          if (val) {
+            preview.innerHTML = `<img src="${val}" style="width:100%;height:100%;object-fit:cover;">`;
+          } else {
+            preview.textContent = (currentSession?.customName || currentSession?.username || 'U')[0].toUpperCase();
+          }
+        });
+      }
+    }
+
+    function removeCurrentAvatar() {
+      const urlInput = document.getElementById('settingsAvatarUrl');
+      const prev = document.getElementById('settingsAvatarPreview');
+      if (urlInput) urlInput.value = '';
+      if (prev) {
+        prev.textContent = (currentSession?.customName || currentSession?.username || 'U')[0].toUpperCase();
+      }
+      showToast('Avatar cleared. Click Save Profile to apply.');
+    }
+
+    setupAvatarFileInput('settingsAvatarFile', 'settingsAvatarUrl', 'settingsAvatarPreview');
+    setupAvatarFileInput('editUserAvatarFile', 'editUserAvatarUrl', 'editUserAvatarPreview');
+    setupAvatarFileInput('newUserAvatarFile', 'newUserAvatarUrl', 'newUserAvatarPreview');
+</script>
+
+  <!-- Receipt Viewer Modal -->
+  <div id="receiptViewerModal" class="modal">
+    <div class="modal-dialog" style="max-width:560px;">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title" id="receiptViewerTitle">Payment Receipt</h3>
+          <p class="modal-subtitle" id="receiptViewerSubtitle" style="font-size:12px; color:var(--muted-foreground); margin-top:2px;"></p>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeReceiptModal()">✕</button>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:12px; padding:6px 0;">
+        <div style="width:100%; max-height:65vh; overflow:auto; border-radius:12px; border:1px solid var(--border); background:var(--muted); display:flex; justify-content:center; align-items:center; padding:8px;">
+          <img id="receiptViewerImg" src="" alt="Receipt" style="max-width:100%; height:auto; border-radius:8px; box-shadow:0 4px 16px rgba(0,0,0,0.2);">
+        </div>
+        <div style="display:flex; justify-content:space-between; width:100%; align-items:center; gap:8px;">
+          <a id="receiptDownloadLink" href="" target="_blank" download="receipt.jpg" class="btn btn-sm btn-outline" style="display:inline-flex; align-items:center; gap:4px;">
+            ⬇️ Open / Save Image
+          </a>
+          <button type="button" class="btn btn-sm btn-primary" onclick="closeReceiptModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
