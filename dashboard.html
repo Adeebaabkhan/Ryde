@@ -1146,7 +1146,7 @@
 
         <button class="nav-item" data-view="products" id="navBtnProducts">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg>
-          <span>Subscription Products</span>
+          <span>Products</span>
         </button>
 
         <button class="nav-item" data-view="salary-rules">
@@ -1400,16 +1400,15 @@
           <div id="accountsList" class="cards-grid"></div>
         </section>
 
-        <!-- ================= VIEW 4: PRODUCT LIST ================= -->
+                <!-- ================= VIEW 4: PRODUCT LIST ================= -->
         <section id="view-products" class="page-view">
           <div class="page-header">
             <div>
-              <h1 class="page-title">Subscription Products</h1>
-              <p class="page-subtitle">Manage subscription plans, profile pricing, and slot capacity</p>
+              <h1 class="page-title">Products</h1>
+              <p class="page-subtitle">Manage app capital, selling prices, and type</p>
             </div>
             <div class="header-controls" id="ownerProductActions">
-              <button class="btn btn-outline" onclick="openManageAppsModal()">⚙️ Manage Apps</button>
-              <button class="btn btn-primary" onclick="openAddSubscriptionModal()">+ Add Subscription Product</button>
+              <button class="btn btn-primary" onclick="openAddProductModal()">+ Add Product</button>
             </div>
           </div>
 
@@ -1864,186 +1863,70 @@
     </div>
   </div>
 
+    
   <!-- Add Product Modal -->
   <div id="addProductModal" class="modal">
     <div class="modal-dialog">
       <div class="modal-header">
-        <h3 class="modal-title">Add Regular Product</h3>
+        <h3 class="modal-title">Add Product</h3>
         <button type="button" class="modal-close-btn" onclick="closeAddProductModal()">✕</button>
       </div>
-      <form id="addProductForm" class="form-grid">
+      <form id="addProductForm" onsubmit="saveNewProduct(event)" class="form-grid">
         <div class="form-field">
-          <label>Product Name</label>
-          <input type="text" id="newProductName" class="input-control" placeholder="e.g. Netflix Shared" required>
-        </div>
-        <div class="form-field">
-          <label>Category</label>
-          <input type="text" id="newProductCategory" class="input-control" placeholder="e.g. Netflix, Canva, Spotify" value="General">
+          <label>App / Product Name</label>
+          <input type="text" id="newProductName" class="input-control" placeholder="e.g. Netflix, HBO, Canva" required>
         </div>
         <div class="form-grid two-col">
           <div class="form-field">
-            <label>Buy Price / Capital</label>
-            <input type="number" id="newBuyPrice" class="input-control" step="0.01" min="0" required>
+            <label>Capital (₱)</label>
+            <input type="number" id="newProductBuyPrice" class="input-control" step="0.01" min="0" placeholder="0.00" required>
           </div>
           <div class="form-field">
-            <label>Sell Price</label>
-            <input type="number" id="newSellPrice" class="input-control" step="0.01" min="0" required>
+            <label>Selling Price (₱)</label>
+            <input type="number" id="newProductSellPrice" class="input-control" step="0.01" min="0" placeholder="0.00" required>
           </div>
         </div>
-        <div class="form-grid two-col">
-          <div class="form-field">
-            <label>Product Commission Rule</label>
-            <select id="newProductCommType" class="select-control">
-              <option value="default">Default (Bracket / Admin Rule)</option>
-              <option value="fixed">Fixed Amount (per unit)</option>
-              <option value="percent">Custom Rate (% of sell)</option>
-            </select>
-          </div>
-          <div class="form-field">
-            <label>Custom Commission Value</label>
-            <input type="number" id="newProductCommValue" class="input-control" step="0.01" min="0" placeholder="Optional">
+        <div class="form-field">
+          <label>Choose whether it's Shared or Solo</label>
+          <div class="radio-pill-group">
+            <label class="radio-pill"><input type="radio" name="newProductTypeRadio" value="Shared" checked> Shared</label>
+            <label class="radio-pill"><input type="radio" name="newProductTypeRadio" value="Solo"> Solo</label>
           </div>
         </div>
-        <button type="submit" class="btn btn-primary">Save Product</button>
+        <button type="submit" class="btn btn-primary">+ Add Product</button>
       </form>
     </div>
   </div>
 
   <!-- Edit Product Modal -->
-  <div id="editProductModal" class="modal">
-    <div class="modal-dialog">
-      <div class="modal-header">
-        <h3 class="modal-title">Edit Product & Commission</h3>
-        <button type="button" class="modal-close-btn" onclick="closeEditProductModal()">✕</button>
-      </div>
-      <form id="editProductForm" onsubmit="saveProductEdit(event)" class="form-grid">
-        <input type="hidden" id="editProductId">
-        <div class="form-field">
-          <label>Product Name</label>
-          <input type="text" id="editProductName" class="input-control" required>
-        </div>
-        <div class="form-field">
-          <label>Category</label>
-          <input type="text" id="editProductCategory" class="input-control" required>
-        </div>
-        <div class="form-grid two-col">
-          <div class="form-field">
-            <label>Buy Price / Capital</label>
-            <input type="number" id="editProductBuyPrice" class="input-control" step="0.01" min="0" required>
-          </div>
-          <div class="form-field">
-            <label>Sell Price</label>
-            <input type="number" id="editProductSellPrice" class="input-control" step="0.01" min="0" required>
-          </div>
-        </div>
-        <div class="form-grid two-col">
-          <div class="form-field">
-            <label>Product Commission Rule</label>
-            <select id="editProductCommType" class="select-control">
-              <option value="default">Default (Bracket / Admin Rule)</option>
-              <option value="fixed">Fixed Amount (per unit)</option>
-              <option value="percent">Custom Rate (% of sell)</option>
-            </select>
-          </div>
-          <div class="form-field">
-            <label>Custom Commission Value</label>
-            <input type="number" id="editProductCommValue" class="input-control" step="0.01" min="0" placeholder="0">
-          </div>
-        </div>
-        <div class="form-field">
-          <label>Account Types</label>
-          <div class="radio-pill-group">
-            <label class="radio-pill"><input type="checkbox" id="editTypeSolo"> Solo</label>
-            <label class="radio-pill"><input type="checkbox" id="editTypeShared"> Shared</label>
-            <label class="radio-pill"><input type="checkbox" id="editTypePremium"> Premium</label>
-          </div>
-        </div>
-        <button type="submit" class="btn btn-primary">Update Product</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- Add Subscription Product Modal -->
-  <div id="addSubscriptionModal" class="modal">
-    <div class="modal-dialog">
-      <div class="modal-header">
-        <h3 class="modal-title">Add Subscription Product</h3>
-        <button type="button" class="modal-close-btn" onclick="closeAddSubscriptionModal()">✕</button>
-      </div>
-      <form id="addSubscriptionForm" class="form-grid">
-        <div class="form-field">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <label style="margin:0;">App / Service</label>
-            <button type="button" class="btn btn-sm btn-outline" onclick="openManageAppsModal()" style="font-size:11px; padding:2px 8px;">⚙️ Manage Apps</button>
-          </div>
-          <input type="text" id="subProductName" class="input-control" placeholder="Select or type app (e.g. Netflix, ChatGPT)" list="shopAppsDatalist" required autocomplete="off" style="margin-top:4px;">
-          <datalist id="shopAppsDatalist"></datalist>
-        </div>
-        <div class="form-grid two-col">
-          <div class="form-field">
-            <label>Capital / Buy Cost per slot (₱)</label>
-            <input type="number" id="subBuyPrice" class="input-control" step="0.01" min="0" placeholder="0.00" value="0.00">
-          </div>
-          <div class="form-field">
-            <label>Full Account Price (₱)</label>
-            <input type="number" id="subFullPrice" class="input-control" step="0.01" min="0" placeholder="0.00" required>
-          </div>
-        </div>
-        <div class="form-grid two-col">
-          <div class="form-field">
-            <label>Solo Profile Price (₱)</label>
-            <input type="number" id="subSoloPrice" class="input-control" step="0.01" min="0" placeholder="0.00" required>
-          </div>
-          <div class="form-field">
-            <label>Shared Profile Price (₱)</label>
-            <input type="number" id="subSharedPrice" class="input-control" step="0.01" min="0" placeholder="0.00" required>
-          </div>
-        </div>
-        <div class="form-field">
-          <label>Total Profiles / Slots</label>
-          <input type="number" id="subTotalProfiles" class="input-control" value="5" min="1" max="20" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Create Subscription Product</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- Edit Subscription Product Modal -->
   <div id="editSubscriptionModal" class="modal">
     <div class="modal-dialog">
       <div class="modal-header">
-        <h3 class="modal-title">Edit Subscription Product</h3>
+        <h3 class="modal-title">Edit Product</h3>
         <button type="button" class="modal-close-btn" onclick="closeEditSubscriptionModal()">✕</button>
       </div>
       <form id="editSubscriptionForm" onsubmit="saveSubscriptionEdit(event)" class="form-grid">
         <input type="hidden" id="editSubProductId">
         <div class="form-field">
-          <label>App / Subscription Name</label>
-          <input type="text" id="editSubProductName" class="input-control" list="shopAppsDatalist" required>
+          <label>App / Product Name</label>
+          <input type="text" id="editSubProductName" class="input-control" required>
         </div>
         <div class="form-grid two-col">
           <div class="form-field">
-            <label>Capital / Buy Cost per slot (₱)</label>
-            <input type="number" id="editSubBuyPrice" class="input-control" step="0.01" min="0" placeholder="0.00" value="0.00">
+            <label>Capital (₱)</label>
+            <input type="number" id="editSubBuyPrice" class="input-control" step="0.01" min="0" placeholder="0.00" required>
           </div>
           <div class="form-field">
-            <label>Full Account Price (₱)</label>
-            <input type="number" id="editSubFullPrice" class="input-control" step="0.01" min="0" required>
-          </div>
-        </div>
-        <div class="form-grid two-col">
-          <div class="form-field">
-            <label>Solo Profile Price (₱)</label>
-            <input type="number" id="editSubSoloPrice" class="input-control" step="0.01" min="0" required>
-          </div>
-          <div class="form-field">
-            <label>Shared Profile Price (₱)</label>
-            <input type="number" id="editSubSharedPrice" class="input-control" step="0.01" min="0" required>
+            <label>Selling Price (₱)</label>
+            <input type="number" id="editSubSellPrice" class="input-control" step="0.01" min="0" placeholder="0.00" required>
           </div>
         </div>
         <div class="form-field">
-          <label>Total Profiles / Slots</label>
-          <input type="number" id="editSubTotalProfiles" class="input-control" min="1" max="20" required>
+          <label>Choose whether it's Shared or Solo</label>
+          <div class="radio-pill-group">
+            <label class="radio-pill"><input type="radio" name="editProductTypeRadio" id="editTypeSharedRadio" value="Shared" checked> Shared</label>
+            <label class="radio-pill"><input type="radio" name="editProductTypeRadio" id="editTypeSoloRadio" value="Solo"> Solo</label>
+          </div>
         </div>
         <button type="submit" class="btn btn-primary">Save Changes</button>
       </form>
@@ -2821,19 +2704,25 @@
         }
       });
 
-      // Subscription Products listener
+            // Subscription Products listener
       getRef('subscriptionProducts').on('value', (snapshot) => {
         const subData = snapshot.val() || {};
         subscriptionProducts = Object.entries(subData).map(([key, data]) => {
           const profilesRaw = data.profiles || [];
           const profiles = Array.isArray(profilesRaw) ? profilesRaw : Object.values(profilesRaw);
+          const sellPrice = Number(data.sellPrice ?? data.soloPrice ?? data.sharedPrice ?? data.fullPrice) || 0;
+          const buyPrice = Number(data.buyPrice ?? data.capital) || 0;
           return {
             id: data.id || key,
             name: data.name || 'Untitled',
-            buyPrice: Number(data.buyPrice) || 0,
-            fullPrice: Number(data.fullPrice) || 0,
-            soloPrice: Number(data.soloPrice || data.profilePrice) || 0,
-            sharedPrice: Number(data.sharedPrice || data.fullPrice) || 0,
+            type: data.type || null,
+            accountTypes: data.accountTypes || [],
+            buyPrice,
+            capital: buyPrice,
+            sellPrice,
+            fullPrice: Number(data.fullPrice || sellPrice) || 0,
+            soloPrice: Number(data.soloPrice || data.profilePrice || sellPrice) || 0,
+            sharedPrice: Number(data.sharedPrice || data.fullPrice || sellPrice) || 0,
             totalProfiles: Number(data.totalProfiles) || profiles.length || 0,
             profiles: profiles.map((p, idx) => ({
               number: p.number ?? idx + 1,
@@ -2845,6 +2734,10 @@
         });
         renderSubscriptionProducts();
         updateProductDropdown();
+        if (sales.length > 0) {
+          sales = sales.map(normalizeSaleRecord);
+          updateUI();
+        }
       });
 
       // Payouts listener
@@ -3257,10 +3150,14 @@
               </div>
               <span class="badge badge-primary">${totals.items} sold</span>
             </div>
-            <div class="metrics-mini-grid">
+                        <div class="metrics-mini-grid" style="grid-template-columns: repeat(4, 1fr); gap: 8px;">
               <div>
                 <div class="metric-mini-label">Sales</div>
                 <div class="metric-mini-val">${formatCurrency(totals.sales)}</div>
+              </div>
+              <div>
+                <div class="metric-mini-label">Capital</div>
+                <div class="metric-mini-val" style="color:var(--muted-foreground);">${formatCurrency(totals.capital)}</div>
               </div>
               <div>
                 <div class="metric-mini-label">Profit</div>
@@ -3401,7 +3298,7 @@
         const mode = user.commissionMode || 'bracket';
         const val = Number(user.profitPercent) || 0;
         if (mode === 'flatRate') {
-          return (price * (val || 25)) / 100;
+          return (unitProfit * (val || 25)) / 100;
         }
         if (mode === 'profitShare') {
           return (unitProfit * (val || 25)) / 100;
@@ -3553,30 +3450,59 @@
       document.getElementById('saleModal').classList.remove('show');
     }
 
+            function getProductType(p) {
+      if (!p) return 'Shared';
+      if (p.type === 'Solo' || p.type === 'Shared') return p.type;
+      const types = Array.isArray(p.accountTypes) ? p.accountTypes : [];
+      if (types.includes('Solo') && !types.includes('Shared')) return 'Solo';
+      if (types.includes('Shared') && !types.includes('Solo')) return 'Shared';
+      const n = (p.name || '').toLowerCase();
+      if (n.includes('solo') || /\bsla\b/.test(n)) return 'Solo';
+      return 'Shared';
+    }
+
     function getAllSubscriptionProducts() {
       const map = new Map();
-      (subscriptionProducts || []).forEach(sp => {
-        if (sp && sp.id) {
-          const buyPrice = Number(sp.buyPrice ?? sp.capital ?? 0);
-          map.set(String(sp.id), { ...sp, buyPrice, capital: buyPrice });
-        }
-      });
       (products || []).forEach(p => {
-        if (p && p.id && !map.has(String(p.id))) {
+        if (p && p.id) {
           const buyPrice = Number(p.buyPrice ?? p.capital ?? 0);
+          const sellPrice = Number(p.sellPrice ?? p.soloPrice ?? p.sharedPrice ?? p.fullPrice ?? 0);
+          const type = getProductType(p);
           map.set(String(p.id), {
+            ...p,
             id: p.id,
             name: p.name,
             category: p.category || p.name,
-            soloPrice: p.soloPrice ?? p.sellPrice ?? 0,
-            sharedPrice: p.sharedPrice ?? p.sellPrice ?? 0,
-            fullPrice: p.fullPrice ?? p.sellPrice ?? 0,
-            sellPrice: p.sellPrice || 0,
+            type,
+            accountTypes: p.accountTypes && p.accountTypes.length ? p.accountTypes : [type],
+            soloPrice: sellPrice,
+            sharedPrice: sellPrice,
+            fullPrice: sellPrice,
+            sellPrice,
             buyPrice,
             capital: buyPrice,
-            totalProfiles: p.totalProfiles || 5,
-            profiles: p.profiles || [],
-            isFromProducts: true
+            totalProfiles: p.totalProfiles || (type === 'Shared' ? 2 : 1),
+            profiles: p.profiles || []
+          });
+        }
+      });
+      (subscriptionProducts || []).forEach(sp => {
+        if (sp && sp.id) {
+          const existing = map.get(String(sp.id)) || {};
+          const buyPrice = Number(sp.buyPrice ?? sp.capital ?? existing.buyPrice ?? 0);
+          const sellPrice = Number(sp.sellPrice ?? sp.soloPrice ?? sp.sharedPrice ?? sp.fullPrice ?? existing.sellPrice ?? 0);
+          const merged = { ...existing, ...sp };
+          const type = getProductType(merged);
+          map.set(String(sp.id), {
+            ...merged,
+            buyPrice,
+            capital: buyPrice,
+            sellPrice,
+            soloPrice: sellPrice,
+            sharedPrice: sellPrice,
+            fullPrice: sellPrice,
+            type,
+            accountTypes: merged.accountTypes && merged.accountTypes.length ? merged.accountTypes : [type]
           });
         }
       });
@@ -3612,11 +3538,17 @@
       const productId = this.value;
       const product = findProductById(productId);
       if (product) {
-        const defaultPrice = product.sellPrice ?? product.soloPrice ?? product.fullPrice ?? 0;
-        document.getElementById('productPriceInput').value = Number(defaultPrice).toFixed(2);
+        const sell = product.sellPrice ?? product.soloPrice ?? product.fullPrice ?? 0;
+        const buy = product.buyPrice ?? product.capital ?? 0;
+        document.getElementById('productPriceInput').value = Number(sell).toFixed(2);
         if (document.getElementById('saleBuyPriceInput')) {
-          document.getElementById('saleBuyPriceInput').value = Number(product.buyPrice ?? product.capital ?? 0).toFixed(2);
+          document.getElementById('saleBuyPriceInput').value = Number(buy).toFixed(2);
         }
+        const isSolo = (product.type === 'Solo') || ((product.accountTypes || []).includes('Solo') && !(product.accountTypes || []).includes('Shared')) || ((product.name || '').toLowerCase().includes('solo'));
+        const soloTypeRadio = document.querySelector('input[name="accountType"][value="Solo"]');
+        const sharedTypeRadio = document.querySelector('input[name="accountType"][value="Shared"]');
+        if (isSolo && soloTypeRadio) soloTypeRadio.checked = true;
+        else if (sharedTypeRadio) sharedTypeRadio.checked = true;
       }
       displayProductDetails(productId);
       handleProductChangeForProfileTracking(productId);
@@ -4051,7 +3983,7 @@
         const productId = row.querySelector('.bulk-product').value;
         if (!productId) continue;
         const product = findProductById(productId);
-        const buyPrice = parseFloat(row.querySelector('.bulk-buy').value) || 0;
+        const buyPrice = parseFloat(row.querySelector('.bulk-buy')?.value) || (product ? Number(product.buyPrice ?? product.capital ?? 0) : 0);
         const price = parseFloat(row.querySelector('.bulk-sell').value) || 0;
         const qty = parseInt(row.querySelector('.bulk-qty').value) || 1;
         const comm = calculateUnitCommission(product, price, buyPrice, currentSession);
@@ -4103,129 +4035,33 @@
     }
 
     // =================== PRODUCTS VIEW ===================
-    function switchProductTab(tab) {
+        function switchProductTab(tab) {
       const subPane = document.getElementById('subscriptionProductsPane');
       if (subPane) subPane.style.display = 'block';
     }
 
-    function openAddProductModal() { document.getElementById('addProductModal').classList.add('show'); }
-    function closeAddProductModal() { document.getElementById('addProductModal').classList.remove('show'); }
-    function openAddSubscriptionModal() { document.getElementById('addSubscriptionModal').classList.add('show'); }
-    function closeAddSubscriptionModal() { document.getElementById('addSubscriptionModal').classList.remove('show'); }
+    function openAddProductModal() { 
+      const modal = document.getElementById('addProductModal');
+      if (modal) modal.classList.add('show'); 
+    }
+    window.openAddProductModal = openAddProductModal;
+    window.openAddSubscriptionModal = openAddProductModal;
 
-    document.getElementById('addProductForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      if (!isOwner()) return;
-      const name = document.getElementById('newProductName').value.trim();
-      const category = document.getElementById('newProductCategory').value.trim() || 'General';
-      const buyPrice = parseFloat(document.getElementById('newBuyPrice').value) || 0;
-      const sellPrice = parseFloat(document.getElementById('newSellPrice').value) || 0;
-      const commType = document.getElementById('newProductCommType')?.value || 'default';
-      const commValue = parseFloat(document.getElementById('newProductCommValue')?.value) || 0;
-      const id = Date.now();
-      const margin = buyPrice > 0 ? ((sellPrice - buyPrice) / buyPrice) * 100 : 0;
-      showSyncingIndicator();
-      getRef('products/' + id).set({
-        id, name, category, buyPrice, sellPrice, margin, commType, commValue,
-        createdDate: new Date().toISOString().split('T')[0]
-      }).then(() => {
-        this.reset();
-        closeAddProductModal();
-        showToast('Product added!');
-      });
-    });
-
-    document.getElementById('addSubscriptionForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      if (!isOwner()) return;
-      const name = document.getElementById('subProductName').value.trim();
-      const buyPrice = parseFloat(document.getElementById('saleBuyPriceInput')?.value) || Number(product.buyPrice ?? product.capital ?? 0);
-      const fullPrice = parseFloat(document.getElementById('subFullPrice').value) || 0;
-      const soloPrice = parseFloat(document.getElementById('subSoloPrice').value) || 0;
-      const sharedPrice = parseFloat(document.getElementById('subSharedPrice').value) || 0;
-      const totalProfiles = parseInt(document.getElementById('subTotalProfiles').value) || 5;
-      const profiles = [];
-      for (let i = 1; i <= totalProfiles; i++) {
-        profiles.push({ number: i, sold: false, soldBy: '', soldDate: '' });
-      }
-      const id = Date.now();
-      showSyncingIndicator();
-      getRef('subscriptionProducts/' + id).set({
-        id: String(id), name, buyPrice: 0, fullPrice, soloPrice, sharedPrice, totalProfiles, profiles,
-        sellPrice: soloPrice || fullPrice || sharedPrice,
-        createdAt: new Date().toISOString().split('T')[0]
-      }).then(() => {
-        ensureAppInList(name);
-        this.reset();
-        closeAddSubscriptionModal();
-        showToast('Subscription product added!');
-      });
-    });
+    function closeAddProductModal() { 
+      const modal = document.getElementById('addProductModal');
+      if (modal) modal.classList.remove('show'); 
+    }
+    window.closeAddProductModal = closeAddProductModal;
+    window.closeAddSubscriptionModal = closeAddProductModal;
 
     function renderProductList() {
       renderSubscriptionProducts();
     }
 
-    function sortProducts(sortBy) {
-      if (sortBy === 'name') {
-        products.sort((a, b) => a.name.localeCompare(b.name));
-      } else if (sortBy === 'price') {
-        products.sort((a, b) => b.sellPrice - a.sellPrice);
-      }
+    
+
+        function sortProducts(sortBy) {
       renderProductList();
-    }
-
-    function editProduct(productId) {
-      if (!isOwner()) return;
-      const product = findProductById(productId);
-      if (!product) return;
-      document.getElementById('editProductId').value = product.id;
-      document.getElementById('editProductName').value = product.name;
-      document.getElementById('editProductCategory').value = product.category || 'General';
-      document.getElementById('editProductBuyPrice').value = product.buyPrice;
-      document.getElementById('editProductSellPrice').value = product.sellPrice;
-      if (document.getElementById('editProductCommType')) {
-        document.getElementById('editProductCommType').value = product.commType || 'default';
-      }
-      if (document.getElementById('editProductCommValue')) {
-        document.getElementById('editProductCommValue').value = product.commValue || '';
-      }
-      document.getElementById('editTypeSolo').checked = (product.accountTypes || []).includes('Solo');
-      document.getElementById('editTypeShared').checked = (product.accountTypes || []).includes('Shared');
-      document.getElementById('editTypePremium').checked = (product.accountTypes || []).includes('Premium');
-      document.getElementById('editProductModal').classList.add('show');
-    }
-    function closeEditProductModal() { document.getElementById('editProductModal').classList.remove('show'); }
-
-    function saveProductEdit(e) {
-      e.preventDefault();
-      if (!isOwner()) return;
-      const id = document.getElementById('editProductId').value;
-      const name = document.getElementById('editProductName').value.trim();
-      const category = document.getElementById('editProductCategory').value.trim();
-      const buyPrice = parseFloat(document.getElementById('editProductBuyPrice').value) || 0;
-      const sellPrice = parseFloat(document.getElementById('editProductSellPrice').value) || 0;
-      const commType = document.getElementById('editProductCommType')?.value || 'default';
-      const commValue = parseFloat(document.getElementById('editProductCommValue')?.value) || 0;
-      const accountTypes = [];
-      if (document.getElementById('editTypeSolo').checked) accountTypes.push('Solo');
-      if (document.getElementById('editTypeShared').checked) accountTypes.push('Shared');
-      if (document.getElementById('editTypePremium').checked) accountTypes.push('Premium');
-      const margin = buyPrice > 0 ? ((sellPrice - buyPrice) / buyPrice) * 100 : 0;
-
-      showSyncingIndicator();
-      getRef('products/' + id).update({
-        id, name, category, buyPrice, sellPrice, margin, accountTypes, commType, commValue,
-        updatedDate: new Date().toISOString().split('T')[0]
-      }).then(() => {
-        closeEditProductModal();
-        showToast('Product updated!');
-      });
-    }
-
-    function deleteProduct(productId) {
-      if (!isOwner() || !confirm('Delete this product?')) return;
-      getRef('products/' + productId).remove().then(() => showToast('Product deleted'));
     }
 
     function renderSubscriptionProducts() {
@@ -4236,168 +4072,221 @@
         container.innerHTML = `
           <div class="panel-card" style="grid-column:1/-1;">
             <div class="empty-box">
-              <h4>No Subscription Products</h4>
-              <p>Add subscription services (e.g. Netflix, ChatGPT) to sell and track slots.</p>
-              ${isOwner() ? '<button class="btn btn-primary" onclick="openAddSubscriptionModal()">+ Add First Subscription</button>' : ''}
+              <h4>No Products Added</h4>
+              <p>Add products with capital, selling price, and solo/shared type.</p>
+              ${isOwner() ? '<button class="btn btn-primary" onclick="openAddProductModal()">+ Add First Product</button>' : ''}
             </div>
           </div>
         `;
         return;
       }
       container.innerHTML = allSubs.map(p => {
-        const avail = (p.profiles || []).filter(pr => !pr.sold).length;
-        const solo = p.soloPrice || p.sellPrice || 0;
-        const shared = p.sharedPrice || p.sellPrice || 0;
-        const full = p.fullPrice || p.sellPrice || 0;
+        const buy = Number(p.buyPrice ?? p.capital ?? 0);
+        const sell = Number(p.sellPrice ?? p.soloPrice ?? p.sharedPrice ?? p.fullPrice ?? 0);
+        const profit = Math.max(sell - buy, 0);
+        const typeLabel = getProductType(p);
+        const isSolo = typeLabel === 'Solo';
+
         return `
           <div class="item-card">
             <div class="item-card-header">
               <div>
                 <div class="item-card-title">${p.name}</div>
-                <div class="item-card-sub">${p.totalProfiles || 5} profiles capacity • Capital: ${formatCurrency(Number(p.buyPrice ?? p.capital ?? 0))}</div>
+                <div class="item-card-sub"><span class="badge ${isSolo ? 'badge-primary' : 'badge-secondary'}">${typeLabel}</span></div>
               </div>
-                            ${isOwner() ? `
+              ${isOwner() ? `
                 <div style="display:flex; gap:6px;">
                   <button type="button" class="btn btn-sm btn-outline" data-id="${p.id}" onclick="editSubscriptionProduct(this.dataset.id || '${p.id}')">Edit</button>
                   <button type="button" class="btn btn-sm btn-danger" data-id="${p.id}" onclick="deleteSubscriptionProduct(this.dataset.id || '${p.id}')">✕</button>
                 </div>
               ` : ''}
             </div>
-            <div class="metrics-mini-grid" style="grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 8px;">
+            <div class="metrics-mini-grid" style="grid-template-columns: repeat(3, 1fr); gap: 8px;">
               <div>
-                <div class="metric-mini-label">Solo Profile</div>
-                <div class="metric-mini-val" style="color:var(--primary); font-weight:700;">${formatCurrency(solo)}</div>
+                <div class="metric-mini-label">Capital</div>
+                <div class="metric-mini-val" style="color:var(--muted-foreground); font-weight:700;">${formatCurrency(buy)}</div>
               </div>
               <div>
-                <div class="metric-mini-label">Shared Profile</div>
-                <div class="metric-mini-val" style="color:var(--success); font-weight:700;">${formatCurrency(shared)}</div>
+                <div class="metric-mini-label">Selling Price</div>
+                <div class="metric-mini-val" style="color:var(--primary); font-weight:700;">${formatCurrency(sell)}</div>
               </div>
               <div>
-                <div class="metric-mini-label">Full Account</div>
-                <div class="metric-mini-val" style="font-weight:700;">${formatCurrency(full)}</div>
+                <div class="metric-mini-label">Profit</div>
+                <div class="metric-mini-val" style="color:var(--success); font-weight:700;">${formatCurrency(profit)}</div>
               </div>
             </div>
           </div>
         `;
       }).join('');
     }
+    window.renderSubscriptionProducts = renderSubscriptionProducts;
 
-        function editSubscriptionProduct(id) {
+    function editSubscriptionProduct(id) {
       if (!isOwner()) {
-        showToast('Only owners can edit products', true);
+        showToast('Only owners can edit products', 'error');
         return;
       }
       if (!id) return;
       const allSubs = getAllSubscriptionProducts();
       const p = allSubs.find(x => String(x.id) === String(id));
       if (!p) {
-        showToast('Product not found: ' + id, true);
+        showToast('Product not found: ' + id, 'error');
         return;
       }
-      const idEl = document.getElementById('editSubProductId');
-      const nameEl = document.getElementById('editSubProductName');
-      const fullEl = document.getElementById('editSubFullPrice');
-      const soloEl = document.getElementById('editSubSoloPrice');
-      const sharedEl = document.getElementById('editSubSharedPrice');
-      const totalEl = document.getElementById('editSubTotalProfiles');
-      const modalEl = document.getElementById('editSubscriptionModal');
+      document.getElementById('editSubProductId').value = p.id;
+      document.getElementById('editSubProductName').value = p.name || '';
+      document.getElementById('editSubBuyPrice').value = Number(p.buyPrice ?? p.capital ?? 0).toFixed(2);
+      const sell = Number(p.sellPrice ?? p.soloPrice ?? p.sharedPrice ?? p.fullPrice ?? 0);
+      document.getElementById('editSubSellPrice').value = sell.toFixed(2);
 
-      if (idEl) idEl.value = p.id;
-      if (nameEl) nameEl.value = p.name || '';
-      const buyEl = document.getElementById('editSubBuyPrice');
-      if (buyEl) buyEl.value = Number(p.buyPrice ?? p.capital ?? 0).toFixed(2);
-      if (fullEl) fullEl.value = Number(p.fullPrice !== undefined && p.fullPrice !== null ? p.fullPrice : (p.sellPrice || 0)).toFixed(2);
-      if (soloEl) soloEl.value = Number(p.soloPrice !== undefined && p.soloPrice !== null ? p.soloPrice : (p.sellPrice || 0)).toFixed(2);
-      if (sharedEl) sharedEl.value = Number(p.sharedPrice !== undefined && p.sharedPrice !== null ? p.sharedPrice : (p.sellPrice || 0)).toFixed(2);
-      if (totalEl) totalEl.value = p.totalProfiles || 5;
-      if (modalEl) modalEl.classList.add('show');
+      const isSolo = getProductType(p) === 'Solo';
+      const soloRadio = document.getElementById('editTypeSoloRadio');
+      const sharedRadio = document.getElementById('editTypeSharedRadio');
+      if (isSolo && soloRadio) {
+        soloRadio.checked = true;
+      } else if (sharedRadio) {
+        sharedRadio.checked = true;
+      }
+
+      document.getElementById('editSubscriptionModal').classList.add('show');
     }
     window.editSubscriptionProduct = editSubscriptionProduct;
+    window.editProduct = editSubscriptionProduct;
 
-    function closeEditSubscriptionModal() { 
+    function closeEditSubscriptionModal() {
       const modalEl = document.getElementById('editSubscriptionModal');
-      if (modalEl) modalEl.classList.remove('show'); 
+      if (modalEl) modalEl.classList.remove('show');
     }
     window.closeEditSubscriptionModal = closeEditSubscriptionModal;
+    window.closeEditProductModal = closeEditSubscriptionModal;
 
     function saveSubscriptionEdit(e) {
       e.preventDefault();
       if (!isOwner()) {
-        showToast('Only owners can edit products', true);
+        showToast('Only owners can edit products', 'error');
         return;
       }
       const id = document.getElementById('editSubProductId').value;
       const allSubs = getAllSubscriptionProducts();
       const existing = allSubs.find(x => String(x.id) === String(id));
       if (!existing) {
-        showToast('Product not found to update', true);
+        showToast('Product not found to update', 'error');
         return;
       }
-      const newTotal = parseInt(document.getElementById('editSubTotalProfiles').value) || existing.totalProfiles || 5;
-      const profiles = [...(existing.profiles || [])];
-      while (profiles.length < newTotal) {
-        profiles.push({ number: profiles.length + 1, sold: false, soldBy: '', soldDate: '' });
-      }
       const name = document.getElementById('editSubProductName').value.trim();
-      const buyPrice = parseFloat(document.getElementById('editSubBuyPrice')?.value) || 0;
-      const fullPrice = parseFloat(document.getElementById('editSubFullPrice').value) || 0;
-      const soloPrice = parseFloat(document.getElementById('editSubSoloPrice').value) || 0;
-      const sharedPrice = parseFloat(document.getElementById('editSubSharedPrice').value) || 0;
+      const buyPrice = parseFloat(document.getElementById('editSubBuyPrice').value) || 0;
+      const sellPrice = parseFloat(document.getElementById('editSubSellPrice').value) || 0;
+      const typeRadio = document.querySelector('input[name="editProductTypeRadio"]:checked');
+      const type = typeRadio ? typeRadio.value : getProductType(existing);
 
       const updated = {
         ...existing,
         id: String(id),
         name,
         category: name,
+        type,
+        accountTypes: [type],
         buyPrice,
         capital: buyPrice,
-        fullPrice,
-        soloPrice,
-        sharedPrice,
-        sellPrice: soloPrice || fullPrice || sharedPrice,
-        totalProfiles: newTotal,
-        profiles: profiles.slice(0, newTotal)
+        sellPrice,
+        soloPrice: sellPrice,
+        sharedPrice: sellPrice,
+        fullPrice: sellPrice,
+        totalProfiles: type === 'Shared' ? 2 : 1,
+        updatedDate: new Date().toISOString().split('T')[0]
       };
-      const wasFromProducts = !!existing.isFromProducts;
       delete updated.isFromProducts;
 
       showSyncingIndicator();
-      getRef('subscriptionProducts/' + id).set(updated).then(() => {
-        if (wasFromProducts) {
-          getRef('products/' + id).remove().catch(() => {});
-        }
-        ensureAppInList(name);
+      Promise.all([
+        getRef('products/' + id).set(updated),
+        getRef('subscriptionProducts/' + id).set(updated)
+      ]).then(() => {
         closeEditSubscriptionModal();
-        showToast('Subscription updated!');
+        showToast('Product updated!');
       }).catch(err => {
-        console.error('Save subscription error:', err);
-        showToast('Error saving: ' + (err.message || err), true);
+        showToast('Error saving: ' + (err.message || err), 'error');
       });
     }
     window.saveSubscriptionEdit = saveSubscriptionEdit;
+    window.saveProductEdit = saveSubscriptionEdit;
+
+    function saveNewProduct(e) {
+      e.preventDefault();
+      if (!isOwner()) return;
+      const name = document.getElementById('newProductName').value.trim();
+      const buyPrice = parseFloat(document.getElementById('newProductBuyPrice').value) || 0;
+      const sellPrice = parseFloat(document.getElementById('newProductSellPrice').value) || 0;
+      const typeRadio = document.querySelector('input[name="newProductTypeRadio"]:checked');
+      const type = typeRadio ? typeRadio.value : 'Shared';
+
+      const id = String(Date.now());
+      const newProd = {
+        id,
+        name,
+        category: name,
+        type,
+        accountTypes: [type],
+        buyPrice,
+        capital: buyPrice,
+        sellPrice,
+        soloPrice: sellPrice,
+        sharedPrice: sellPrice,
+        fullPrice: sellPrice,
+        totalProfiles: type === 'Shared' ? 2 : 1,
+        createdAt: new Date().toISOString().split('T')[0]
+      };
+
+      showSyncingIndicator();
+      Promise.all([
+        getRef('products/' + id).set(newProd),
+        getRef('subscriptionProducts/' + id).set(newProd)
+      ]).then(() => {
+        document.getElementById('addProductForm').reset();
+        closeAddProductModal();
+        showToast('Product added!');
+      }).catch(err => {
+        showToast('Error adding: ' + (err.message || err), 'error');
+      });
+    }
+    window.saveNewProduct = saveNewProduct;
 
     function deleteSubscriptionProduct(id) {
       if (!isOwner()) {
-        showToast('Only owners can delete products', true);
+        showToast('Only owners can delete products', 'error');
         return;
       }
-      if (!id || !confirm('Delete this subscription product?')) return;
-      const allSubs = getAllSubscriptionProducts();
-      const existing = allSubs.find(x => String(x.id) === String(id));
-      const wasFromProducts = existing && existing.isFromProducts;
+      if (!id || !confirm('Delete this product?')) return;
 
       showSyncingIndicator();
       Promise.all([
         getRef('subscriptionProducts/' + id).remove().catch(() => {}),
-        wasFromProducts ? getRef('products/' + id).remove().catch(() => {}) : Promise.resolve()
+        getRef('products/' + id).remove().catch(() => {})
       ]).then(() => {
-        showToast('Subscription deleted!');
+        showToast('Product deleted!');
       }).catch(err => {
-        console.error('Delete subscription error:', err);
-        showToast('Error deleting: ' + (err.message || err), true);
+        showToast('Error deleting: ' + (err.message || err), 'error');
       });
     }
     window.deleteSubscriptionProduct = deleteSubscriptionProduct;
+    window.deleteProduct = deleteSubscriptionProduct;
+
+    // =================== APPS & SERVICES STATE ===================
+    let defaultAppsList = ['ChatGPT', 'Netflix', 'Spotify', 'Canva', 'YouTube', 'Disney+', 'Prime Video', 'HBO Max', 'VIU', 'Vivamax', 'CapCut'];
+    let shopApps = [...defaultAppsList];
+
+    function ensureAppInList(appName) {
+      if (!appName) return;
+      const clean = appName.trim();
+      if (!clean) return;
+      if (!shopApps.some(a => a.toLowerCase() === clean.toLowerCase())) {
+        shopApps.push(clean);
+        if (isOwner()) {
+          getRef('settings/appsList').set(shopApps);
+        }
+        renderAppsInDropdowns();
+      }
+    }
 
     function renderAppsInDropdowns(selectedVal = '') {
       // 1. Datalist for inputs
@@ -5416,5 +5305,6 @@
     </div>
   </div>
 
+<datalist id="shopAppsDatalist"></datalist>
 </body>
 </html>
