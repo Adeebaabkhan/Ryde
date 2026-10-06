@@ -1655,7 +1655,7 @@
           </select>
         </div>
 
-        <div class="form-grid three-col">
+                <div class="form-grid two-col">
           <div class="form-field">
             <label>Quantity</label>
             <input type="number" id="productQuantity" class="input-control" value="1" min="1" required>
@@ -1664,9 +1664,16 @@
             <label>Unit Capital (₱)</label>
             <input type="number" id="saleBuyPriceInput" class="input-control" step="0.01" min="0" placeholder="0.00">
           </div>
+        </div>
+
+        <div class="form-grid two-col">
           <div class="form-field">
             <label>Unit Sale Price (₱)</label>
             <input type="number" id="productPriceInput" class="input-control" step="0.01" min="0" required>
+          </div>
+          <div class="form-field">
+            <label>Buyer Tip (₱) <span style="font-size:11px; color:var(--muted-foreground); font-weight:normal;">(Optional)</span></label>
+            <input type="number" id="saleTipInput" class="input-control" step="0.01" min="0" placeholder="0.00">
           </div>
         </div>
 
@@ -1849,6 +1856,7 @@
               <th>Email</th>
               <th>Sell</th>
               <th>Qty</th>
+              <th>Tip</th>
               <th>Status</th>
               <th></th>
             </tr>
@@ -2860,7 +2868,8 @@
       const sale = { ...rawSale };
       sale.quantity = parseInt(sale.quantity) || 1;
       sale.price = Number(sale.price || sale.sellPrice) || 0;
-      sale.totalPrice = Number(sale.totalPrice) || (sale.price * sale.quantity);
+      sale.tip = Number(rawSale.tip) || 0;
+      sale.totalPrice = Number(rawSale.totalPrice) || ((sale.price * sale.quantity) + sale.tip);
       sale.sold = sale.sold !== false;
       sale.receiptUrl = rawSale.receiptUrl || null;
       
@@ -2964,9 +2973,10 @@
         const qty = parseInt(s.quantity) || 1;
         const price = parseFloat(s.price) || 0;
         const buy = parseFloat(s.buyPrice) || 0;
-        const rev = price * qty;
+        const tip = parseFloat(s.tip) || 0;
+        const rev = (price * qty) + tip;
         const unitComm = getEffectiveSaleUnitCommission(s, filtered);
-        const comm = unitComm * qty;
+        const comm = (unitComm * qty) + tip;
 
         submittedSales += rev;
         totalQty += qty;
@@ -2976,7 +2986,7 @@
           officialSales += rev;
           officialCount += 1;
           totalCapital += buy * qty;
-          totalProfit += (price - buy) * qty;
+          totalProfit += ((price - buy) * qty) + tip;
           if ((s.userRole || '').toLowerCase() !== 'owner') {
             totalSalary += comm;
           }
@@ -2995,7 +3005,7 @@
 
       let todayAmount = 0, todayCount = 0, weekAmount = 0, weekCount = 0;
       allUserScoped.forEach(s => {
-        const rev = (parseFloat(s.price) || 0) * (parseInt(s.quantity) || 1);
+        const rev = ((parseFloat(s.price) || 0) * (parseInt(s.quantity) || 1)) + (parseFloat(s.tip) || 0);
         if (s.date === todayStr) {
           todayAmount += rev;
           todayCount += 1;
@@ -3102,7 +3112,10 @@
           ${isOwner() ? `<td>${s.userName || ''}</td>` : ''}
           <td style="font-weight:500;">${s.productName || ''}</td>
           <td>${s.quantity}</td>
-          <td style="font-weight:600;">${formatCurrency(s.totalPrice)}</td>
+          <td style="font-weight:600;">
+            ${formatCurrency(s.totalPrice)}
+            ${Number(s.tip) > 0 ? `<div style="font-size:10px; color:var(--primary); font-weight:normal;">+${formatCurrency(s.tip)} tip</div>` : ''}
+          </td>
           <td style="color:var(--muted-foreground);">${formatCurrency((Number(s.buyPrice) || 0) * (parseInt(s.quantity) || 1))}</td>
           <td style="color:var(--success); font-weight:600;">${formatCurrency(Math.max((Number(s.totalPrice) || 0) - ((Number(s.buyPrice) || 0) * (parseInt(s.quantity) || 1)), 0))}</td>
           <td><span class="badge ${s.sold ? 'badge-verified' : 'badge-pending'}">${s.sold ? 'Verified' : 'Pending'}</span></td>
@@ -3132,10 +3145,11 @@
           const qty = parseInt(s.quantity) || 1;
           const price = parseFloat(s.price) || 0;
           const buy = parseFloat(s.buyPrice) || 0;
-          acc.sales += price * qty;
+          const tip = parseFloat(s.tip) || 0;
+          acc.sales += (price * qty) + tip;
           acc.capital += buy * qty;
-          acc.profit += (price - buy) * qty;
-          acc.salary += getEffectiveSaleUnitCommission(s, periodSales) * qty;
+          acc.profit += ((price - buy) * qty) + tip;
+          acc.salary += (getEffectiveSaleUnitCommission(s, periodSales) * qty) + tip;
           acc.items += qty;
           return acc;
         }, { sales: 0, capital: 0, profit: 0, salary: 0, items: 0 });
@@ -3271,7 +3285,7 @@
         if (!s.sold) return sum;
         const match = (uId && String(s.userId) === String(uId)) || (uKey && s.userKey === uKey);
         if (!match) return sum;
-        return sum + ((parseFloat(s.price) || 0) * (parseInt(s.quantity) || 1));
+        return sum + ((parseFloat(s.price) || 0) * (parseInt(s.quantity) || 1)) + (parseFloat(s.tip) || 0);
       }, 0);
     }
 
@@ -3365,12 +3379,16 @@
       tableWrap.style.display = 'block';
 
       tbody.innerHTML = filtered.map(sale => {
-        const commTotal = getEffectiveSaleUnitCommission(sale, filtered) * (parseInt(sale.quantity) || 1);
+        const commTotal = (getEffectiveSaleUnitCommission(sale, filtered) * (parseInt(sale.quantity) || 1)) + (Number(sale.tip) || 0);
+        const hasTip = Number(sale.tip) > 0;
         return `
           <tr>
             <td>${sale.date || '-'}</td>
             ${isOwner() ? `<td>${sale.userName || '-'}</td>` : ''}
-            <td style="font-weight:500;">${sale.productName || '-'}</td>
+            <td style="font-weight:500;">
+              ${sale.productName || '-'}
+              ${hasTip ? `<div style="font-size:10px; color:var(--primary); font-weight:600;">+${formatCurrency(sale.tip)} tip</div>` : ''}
+            </td>
             <td>${sale.buyerUsername || '-'}</td>
             <td>${sale.accountEmail || '-'}</td>
             <td><span class="badge badge-secondary">${sale.accountType || 'Solo'} • ${sale.warranty || 'FW'}</span></td>
@@ -3379,7 +3397,10 @@
             <td style="font-weight:600;">${formatCurrency(sale.totalPrice)}</td>
             <td style="color:var(--muted-foreground);">${formatCurrency((Number(sale.buyPrice) || 0) * (parseInt(sale.quantity) || 1))}</td>
             <td style="color:var(--success); font-weight:600;">${formatCurrency(Math.max((Number(sale.totalPrice) || 0) - ((Number(sale.buyPrice) || 0) * (parseInt(sale.quantity) || 1)), 0))}</td>
-            <td style="color:var(--primary); font-weight:500;">${formatCurrency(commTotal)}</td>
+            <td style="color:var(--primary); font-weight:500;">
+              ${formatCurrency(commTotal)}
+              ${hasTip ? `<div style="font-size:10px; color:var(--muted-foreground);">(incl. tip)</div>` : ''}
+            </td>
             <td>
               ${sale.receiptUrl ? `
                 <button type="button" class="btn btn-sm btn-outline" onclick="openReceiptModal('${sale.id}')" style="display:inline-flex; align-items:center; gap:4px; padding:3px 8px; font-size:11px; white-space:nowrap; color:var(--primary); font-weight:600;" title="View payment receipt">
@@ -3422,6 +3443,7 @@
       document.getElementById('saleModalTitle').textContent = 'Add Sale';
       document.getElementById('addSaleForm').reset();
       if (document.getElementById('saleBuyPriceInput')) document.getElementById('saleBuyPriceInput').value = '';
+      if (document.getElementById('saleTipInput')) document.getElementById('saleTipInput').value = '';
       document.getElementById('productDetailsCard').style.display = 'none';
       document.getElementById('totalEarningsCard').style.display = 'none';
       document.getElementById('profileTrackingFields').style.display = 'none';
@@ -3554,7 +3576,7 @@
       handleProductChangeForProfileTracking(productId);
     });
 
-    ['productQuantity', 'productPriceInput', 'saleBuyPriceInput', 'saleCustomCommissionInput', 'saleAssignedUserSelect'].forEach(id => {
+    ['productQuantity', 'productPriceInput', 'saleBuyPriceInput', 'saleTipInput', 'saleCustomCommissionInput', 'saleAssignedUserSelect'].forEach(id => {
       const el = document.getElementById(id);
       if (el) {
         el.addEventListener('input', () => displayProductDetails(document.getElementById('productSelect').value));
@@ -3604,24 +3626,28 @@
         unitEarn = parseFloat(customCommInput.value) || 0;
       }
 
+      const tipInput = document.getElementById('saleTipInput');
+      const tip = tipInput && tipInput.value ? parseFloat(tipInput.value) || 0 : 0;
       const unitProfit = Math.max(userPrice - userBuy, 0);
-      const totalRev = userPrice * qty;
+      const totalRev = (userPrice * qty) + tip;
       const totalCap = userBuy * qty;
       const totalProf = Math.max(totalRev - totalCap, 0);
+      const isOwnerUser = (targetUser && (targetUser.role || '').toLowerCase() === 'owner');
+      const totalAdminEarn = isOwnerUser ? totalProf : (unitEarn * qty) + tip;
 
       document.getElementById('productPrice').textContent = formatCurrency(userPrice);
       const buyEl = document.getElementById('productBuyPrice');
       if (buyEl) buyEl.textContent = formatCurrency(userBuy);
       document.getElementById('productMargin').textContent = formatCurrency(unitProfit);
       document.getElementById('productCommission').textContent = formatCurrency(unitEarn);
-      document.getElementById('totalPrice').textContent = formatCurrency(totalRev);
+      document.getElementById('totalPrice').textContent = tip > 0 ? `${formatCurrency(totalRev)} (incl. ${formatCurrency(tip)} tip)` : formatCurrency(totalRev);
       const capPreviewEl = document.getElementById('totalCapitalPreview');
       if (capPreviewEl) capPreviewEl.textContent = formatCurrency(totalCap);
       const profitPreviewEl = document.getElementById('totalProfitPreview');
       if (profitPreviewEl) profitPreviewEl.textContent = formatCurrency(totalProf);
       const ratePreviewEl = document.getElementById('previewRateLabel');
       if (ratePreviewEl) ratePreviewEl.textContent = `${activeRate}%`;
-      document.getElementById('totalEarnings').textContent = formatCurrency(unitEarn * qty);
+      document.getElementById('totalEarnings').textContent = tip > 0 ? `${formatCurrency(totalAdminEarn)} (incl. ${formatCurrency(tip)} tip)` : formatCurrency(totalAdminEarn);
 
       document.getElementById('productDetailsCard').style.display = 'grid';
       document.getElementById('totalEarningsCard').style.display = 'block';
@@ -3774,6 +3800,7 @@
       const price = parseFloat(document.getElementById('productPriceInput').value) || Number(product.sellPrice || 0);
 
       const buyPrice = parseFloat(document.getElementById('saleBuyPriceInput')?.value) || Number(product.buyPrice ?? product.capital ?? 0);
+      const tip = parseFloat(document.getElementById('saleTipInput')?.value) || 0;
 
       const targetUser = getSelectedSaleTargetUser();
       const targetUsername = targetUser ? targetUser.username : currentSession.username;
@@ -3823,10 +3850,11 @@
         price: price,
         buyPrice: buyPrice,
         sellPrice: price,
+        tip: tip,
         commission: commissionAmount,
         customCommission: hasCustomCommission ? commissionAmount : null,
-        totalPrice: price * quantity,
-        totalCommission: commissionAmount * quantity,
+        totalPrice: (price * quantity) + tip,
+        totalCommission: (commissionAmount * quantity) + tip,
         sold: document.getElementById('productSoldStatus').value === 'yes',
         date: chosenDate,
         timestamp: isEditing && editingSale.timestamp ? editingSale.timestamp : timestamp,
@@ -3858,6 +3886,9 @@
       document.getElementById('productPriceInput').value = Number(sale.price || 0).toFixed(2);
       if (document.getElementById('saleBuyPriceInput')) {
         document.getElementById('saleBuyPriceInput').value = Number(sale.buyPrice || 0).toFixed(2);
+      }
+      if (document.getElementById('saleTipInput')) {
+        document.getElementById('saleTipInput').value = (sale.tip !== undefined && sale.tip !== null && Number(sale.tip) > 0) ? Number(sale.tip).toFixed(2) : '';
       }
       document.getElementById('buyerUsernameInput').value = sale.buyerUsername || '';
       document.getElementById('accountEmailInput').value = sale.accountEmail || '';
@@ -3943,6 +3974,7 @@
         <td><input type="email" class="input-control bulk-email" placeholder="email@..."></td>
         <td><input type="number" class="input-control bulk-sell" style="width:80px;" step="0.01"></td>
         <td><input type="number" class="input-control bulk-qty" style="width:65px;" value="1" min="1"></td>
+        <td><input type="number" class="input-control bulk-tip" style="width:65px;" placeholder="0" step="0.01"></td>
         <td><select class="select-control bulk-status"><option value="yes">Sold</option><option value="no">Stock</option></select></td>
         <td><button type="button" class="btn btn-sm btn-danger" onclick="removeBulkRow(${rowId})">✕</button></td>
       `;
@@ -3986,6 +4018,7 @@
         const buyPrice = parseFloat(row.querySelector('.bulk-buy')?.value) || (product ? Number(product.buyPrice ?? product.capital ?? 0) : 0);
         const price = parseFloat(row.querySelector('.bulk-sell').value) || 0;
         const qty = parseInt(row.querySelector('.bulk-qty').value) || 1;
+        const tip = parseFloat(row.querySelector('.bulk-tip')?.value) || 0;
         const comm = calculateUnitCommission(product, price, buyPrice, currentSession);
         const saleId = Date.now() + saved;
         const bulkBuyer = row.querySelector('.bulk-username').value.trim() || '-';
@@ -4015,8 +4048,9 @@
           buyPrice,
           sellPrice: price,
           commission: comm,
-          totalPrice: price * qty,
-          totalCommission: comm * qty,
+          tip: tip,
+          totalPrice: (price * qty) + tip,
+          totalCommission: (comm * qty) + tip,
           sold: row.querySelector('.bulk-status').value === 'yes',
           date: new Date().toISOString().split('T')[0],
           timestamp: Date.now()
@@ -4649,7 +4683,7 @@
         const qty = parseInt(s.quantity) || 1;
         await getRef(`sales/${s.userKey}/${s.id}`).update({
           commission: newUnitComm,
-          totalCommission: newUnitComm * qty
+          totalCommission: (newUnitComm * qty) + (parseFloat(s.tip) || 0)
         });
         count++;
       }
@@ -4785,7 +4819,7 @@
       adminUsers.forEach(user => {
         const uKey = sanitizeUserKey(user.username);
         const userSales = sales.filter(s => (String(s.userId) === String(user.id) || s.userKey === uKey) && s.sold);
-        const totalCommission = userSales.reduce((sum, s) => sum + (getEffectiveSaleUnitCommission(s, sales) * (parseInt(s.quantity) || 1)), 0);
+        const totalCommission = userSales.reduce((sum, s) => sum + (getEffectiveSaleUnitCommission(s, sales) * (parseInt(s.quantity) || 1)) + (parseFloat(s.tip) || 0), 0);
         const paidTotal = payouts
           .filter(p => String(p.userId) === String(user.id) && p.status === 'paid')
           .reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
