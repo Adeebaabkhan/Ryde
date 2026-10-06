@@ -1174,7 +1174,7 @@
         <div class="user-mini">
           <div class="user-avatar-sm" id="userAvatar">R</div>
           <div class="user-mini-info">
-            <p class="user-mini-name" id="userName">sxo</p>
+            <p class="user-mini-name" id="userName">Ryde</p>
             <p class="user-mini-role" id="userRole">Owner</p>
           </div>
         </div>
@@ -1193,7 +1193,7 @@
           <button class="menu-trigger" id="openSidebarBtn" aria-label="Open menu">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
           </button>
-          <span class="mobile-brand-text">SXO</span>
+          <span class="mobile-brand-text">Ryde</span>
         </div>
 
         <div class="header-right">
@@ -1594,7 +1594,7 @@
               <form id="ownerShopSettingsForm" class="form-grid">
                 <div class="form-field">
                   <label>Shop / Brand Name</label>
-                  <input type="text" id="settingsShopName" class="input-control" placeholder="SXO" required>
+                  <input type="text" id="settingsShopName" class="input-control" placeholder="Ryde" required>
                 </div>
                 <div class="form-grid two-col">
                   <div class="form-field">
@@ -2571,7 +2571,7 @@
     }
 
     function applyShopConfig() {
-      const name = (shopConfig && shopConfig.shopName) ? shopConfig.shopName : 'SXO';
+      const name = (shopConfig && shopConfig.shopName) ? shopConfig.shopName : 'Ryde';
       document.title = `${name} — Sales Tracker`;
       const brandEl = document.querySelector('.brand-script');
       if (brandEl) brandEl.textContent = name;
@@ -5150,7 +5150,7 @@
     document.getElementById('ownerShopSettingsForm').addEventListener('submit', async function(e) {
       e.preventDefault();
       if (!isOwner()) return;
-      const shopName = document.getElementById('settingsShopName').value.trim() || 'SXO';
+      const shopName = document.getElementById('settingsShopName').value.trim() || 'Ryde';
       const currency = document.getElementById('settingsCurrencySymbol').value.trim() || '₱';
       const defaultRate = parseFloat(document.getElementById('settingsDefaultRate').value) || 20;
       showSyncingIndicator();
