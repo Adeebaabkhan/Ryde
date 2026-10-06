@@ -1295,6 +1295,8 @@
                     <th>Item</th>
                     <th>Qty</th>
                     <th>Total</th>
+                    <th>Capital</th>
+                    <th>Profit</th>
                     <th>Status</th>
                   </tr>
                 </thead>
@@ -1366,7 +1368,10 @@
                     <th>Qty</th>
                     <th>Price</th>
                     <th>Total</th>
+                    <th>Capital</th>
+                    <th>Profit</th>
                     <th>Salary</th>
+                    <th>Receipt</th>
                     <th>Status</th>
                     <th>Actions</th>
                   </tr>
@@ -1651,13 +1656,17 @@
           </select>
         </div>
 
-        <div class="form-grid two-col">
+        <div class="form-grid three-col">
           <div class="form-field">
             <label>Quantity</label>
             <input type="number" id="productQuantity" class="input-control" value="1" min="1" required>
           </div>
           <div class="form-field">
-            <label>Unit Sale Price</label>
+            <label>Unit Capital (₱)</label>
+            <input type="number" id="saleBuyPriceInput" class="input-control" step="0.01" min="0" placeholder="0.00">
+          </div>
+          <div class="form-field">
+            <label>Unit Sale Price (₱)</label>
             <input type="number" id="productPriceInput" class="input-control" step="0.01" min="0" required>
           </div>
         </div>
@@ -1684,6 +1693,10 @@
         <!-- Live Price & Earnings Preview -->
         <div id="productDetailsCard" class="summary-strip" style="display:none;">
           <div>
+            <div class="metric-mini-label">Unit Capital</div>
+            <div class="metric-mini-val" id="productBuyPrice" style="color:var(--muted-foreground);">₱0.00</div>
+          </div>
+          <div>
             <div class="metric-mini-label">Unit Price</div>
             <div class="metric-mini-val" id="productPrice">₱0.00</div>
           </div>
@@ -1698,6 +1711,7 @@
         </div>
         <div id="totalEarningsCard" style="display:none; font-size:12px; color:var(--muted-foreground); margin-top:-6px;">
           Total Sale: <strong id="totalPrice" style="color:var(--foreground);">₱0.00</strong> •
+          Total Capital: <strong id="totalCapitalPreview" style="color:var(--muted-foreground);">₱0.00</strong> •
           Total Profit: <strong id="totalProfitPreview" style="color:var(--success);">₱0.00</strong> •
           Salary (<span id="previewRateLabel">25%</span>): <strong id="totalEarnings" style="color:var(--primary);">₱0.00</strong>
         </div>
@@ -1965,9 +1979,15 @@
           <input type="text" id="subProductName" class="input-control" placeholder="Select or type app (e.g. Netflix, ChatGPT)" list="shopAppsDatalist" required autocomplete="off" style="margin-top:4px;">
           <datalist id="shopAppsDatalist"></datalist>
         </div>
-        <div class="form-field">
-          <label>Full Account Price (₱)</label>
-          <input type="number" id="subFullPrice" class="input-control" step="0.01" min="0" placeholder="0.00" required>
+        <div class="form-grid two-col">
+          <div class="form-field">
+            <label>Capital / Buy Cost per slot (₱)</label>
+            <input type="number" id="subBuyPrice" class="input-control" step="0.01" min="0" placeholder="0.00" value="0.00">
+          </div>
+          <div class="form-field">
+            <label>Full Account Price (₱)</label>
+            <input type="number" id="subFullPrice" class="input-control" step="0.01" min="0" placeholder="0.00" required>
+          </div>
         </div>
         <div class="form-grid two-col">
           <div class="form-field">
@@ -2001,9 +2021,15 @@
           <label>App / Subscription Name</label>
           <input type="text" id="editSubProductName" class="input-control" list="shopAppsDatalist" required>
         </div>
-        <div class="form-field">
-          <label>Full Account Price (₱)</label>
-          <input type="number" id="editSubFullPrice" class="input-control" step="0.01" min="0" required>
+        <div class="form-grid two-col">
+          <div class="form-field">
+            <label>Capital / Buy Cost per slot (₱)</label>
+            <input type="number" id="editSubBuyPrice" class="input-control" step="0.01" min="0" placeholder="0.00" value="0.00">
+          </div>
+          <div class="form-field">
+            <label>Full Account Price (₱)</label>
+            <input type="number" id="editSubFullPrice" class="input-control" step="0.01" min="0" required>
+          </div>
         </div>
         <div class="form-grid two-col">
           <div class="form-field">
@@ -2944,11 +2970,12 @@
       sale.totalPrice = Number(sale.totalPrice) || (sale.price * sale.quantity);
       sale.sold = sale.sold !== false;
       sale.receiptUrl = rawSale.receiptUrl || null;
-      const hasBuyPrice = sale.buyPrice !== undefined && sale.buyPrice !== null && sale.buyPrice !== '';
+      
+      const hasBuyPrice = sale.buyPrice !== undefined && sale.buyPrice !== null && sale.buyPrice !== '' && !isNaN(sale.buyPrice);
       let buyPrice = hasBuyPrice ? Number(sale.buyPrice) : NaN;
-      if (isNaN(buyPrice)) {
-        const matchingProduct = products.find(p => String(p.id) === String(sale.productId));
-        buyPrice = matchingProduct ? Number(matchingProduct.buyPrice) || 0 : 0;
+      if (isNaN(buyPrice) || buyPrice === 0) {
+        const prod = findProductById(sale.productId) || getAllSubscriptionProducts().find(p => (p.name || '').toLowerCase() === (sale.productName || '').toLowerCase());
+        buyPrice = prod ? Number(prod.buyPrice ?? prod.capital ?? 0) : 0;
       }
       sale.buyPrice = buyPrice;
       return sale;
@@ -3114,7 +3141,8 @@
           ]
         : [
             { label: 'My Sales', value: formatCurrency(submittedSales), sub: `${filtered.length} entries`, icon: ICONS.cart },
-            { label: 'Verified Sales', value: formatCurrency(officialSales), sub: `Profit: ${formatCurrency(totalProfit)}`, icon: ICONS.check },
+            { label: 'Total Capital', value: formatCurrency(totalCapital), sub: 'Product / Slot cost', icon: ICONS.box },
+            { label: 'Net Profit', value: formatCurrency(totalProfit), sub: 'Sales – Capital', icon: ICONS.trend },
             { label: 'My Salary', value: formatCurrency(totalSalary), sub: `${myRate}% of ${formatCurrency(totalProfit)} profit`, icon: ICONS.dollar },
             { label: 'Qty Sold', value: String(totalQty), sub: `${filtered.length} orders`, icon: ICONS.chart },
             { label: 'Pending', value: String(pendingCount), sub: '0 rejected', icon: ICONS.clock },
@@ -3182,6 +3210,8 @@
           <td style="font-weight:500;">${s.productName || ''}</td>
           <td>${s.quantity}</td>
           <td style="font-weight:600;">${formatCurrency(s.totalPrice)}</td>
+          <td style="color:var(--muted-foreground);">${formatCurrency((Number(s.buyPrice) || 0) * (parseInt(s.quantity) || 1))}</td>
+          <td style="color:var(--success); font-weight:600;">${formatCurrency(Math.max((Number(s.totalPrice) || 0) - ((Number(s.buyPrice) || 0) * (parseInt(s.quantity) || 1)), 0))}</td>
           <td><span class="badge ${s.sold ? 'badge-verified' : 'badge-pending'}">${s.sold ? 'Verified' : 'Pending'}</span></td>
         </tr>
       `).join('');
@@ -3450,6 +3480,8 @@
             <td>${sale.quantity}</td>
             <td>${formatCurrency(sale.price)}</td>
             <td style="font-weight:600;">${formatCurrency(sale.totalPrice)}</td>
+            <td style="color:var(--muted-foreground);">${formatCurrency((Number(sale.buyPrice) || 0) * (parseInt(sale.quantity) || 1))}</td>
+            <td style="color:var(--success); font-weight:600;">${formatCurrency(Math.max((Number(sale.totalPrice) || 0) - ((Number(sale.buyPrice) || 0) * (parseInt(sale.quantity) || 1)), 0))}</td>
             <td style="color:var(--primary); font-weight:500;">${formatCurrency(commTotal)}</td>
             <td>
               ${sale.receiptUrl ? `
@@ -3492,6 +3524,7 @@
       editingSale = null;
       document.getElementById('saleModalTitle').textContent = 'Add Sale';
       document.getElementById('addSaleForm').reset();
+      if (document.getElementById('saleBuyPriceInput')) document.getElementById('saleBuyPriceInput').value = '';
       document.getElementById('productDetailsCard').style.display = 'none';
       document.getElementById('totalEarningsCard').style.display = 'none';
       document.getElementById('profileTrackingFields').style.display = 'none';
@@ -3523,18 +3556,24 @@
     function getAllSubscriptionProducts() {
       const map = new Map();
       (subscriptionProducts || []).forEach(sp => {
-        if (sp && sp.id) map.set(String(sp.id), { ...sp });
+        if (sp && sp.id) {
+          const buyPrice = Number(sp.buyPrice ?? sp.capital ?? 0);
+          map.set(String(sp.id), { ...sp, buyPrice, capital: buyPrice });
+        }
       });
       (products || []).forEach(p => {
         if (p && p.id && !map.has(String(p.id))) {
+          const buyPrice = Number(p.buyPrice ?? p.capital ?? 0);
           map.set(String(p.id), {
             id: p.id,
             name: p.name,
             category: p.category || p.name,
-            soloPrice: p.sellPrice || 0,
-            sharedPrice: p.sellPrice || 0,
-            fullPrice: p.sellPrice || 0,
+            soloPrice: p.soloPrice ?? p.sellPrice ?? 0,
+            sharedPrice: p.sharedPrice ?? p.sellPrice ?? 0,
+            fullPrice: p.fullPrice ?? p.sellPrice ?? 0,
             sellPrice: p.sellPrice || 0,
+            buyPrice,
+            capital: buyPrice,
             totalProfiles: p.totalProfiles || 5,
             profiles: p.profiles || [],
             isFromProducts: true
@@ -3575,12 +3614,15 @@
       if (product) {
         const defaultPrice = product.sellPrice ?? product.soloPrice ?? product.fullPrice ?? 0;
         document.getElementById('productPriceInput').value = Number(defaultPrice).toFixed(2);
+        if (document.getElementById('saleBuyPriceInput')) {
+          document.getElementById('saleBuyPriceInput').value = Number(product.buyPrice ?? product.capital ?? 0).toFixed(2);
+        }
       }
       displayProductDetails(productId);
       handleProductChangeForProfileTracking(productId);
     });
 
-    ['productQuantity', 'productPriceInput', 'saleCustomCommissionInput', 'saleAssignedUserSelect'].forEach(id => {
+    ['productQuantity', 'productPriceInput', 'saleBuyPriceInput', 'saleCustomCommissionInput', 'saleAssignedUserSelect'].forEach(id => {
       const el = document.getElementById(id);
       if (el) {
         el.addEventListener('input', () => displayProductDetails(document.getElementById('productSelect').value));
@@ -3614,6 +3656,9 @@
 
       const baseSell = Number(product.soloPrice ?? product.sellPrice ?? product.fullPrice ?? product.sharedPrice) || 0;
       const userPrice = priceInput && priceInput.value ? parseFloat(priceInput.value) : baseSell;
+      const baseBuy = Number(product.buyPrice ?? product.capital ?? 0);
+      const buyPriceInput = document.getElementById('saleBuyPriceInput');
+      const userBuy = buyPriceInput && buyPriceInput.value !== '' ? parseFloat(buyPriceInput.value) : baseBuy;
 
       const targetUser = getSelectedSaleTargetUser();
       const existingUserSales = getUserTotalVerifiedSales(targetUser);
@@ -3622,17 +3667,26 @@
         ? 100
         : getCommissionRateForProfit(projectedTotalSales, targetUser ? targetUser.id : null);
 
-      let unitEarn = calculateUnitCommission(product, userPrice, 0, targetUser, projectedTotalSales);
+      let unitEarn = calculateUnitCommission(product, userPrice, userBuy, targetUser, projectedTotalSales);
       if (isOwner() && customCommInput && customCommInput.value !== '') {
         unitEarn = parseFloat(customCommInput.value) || 0;
       }
 
+      const unitProfit = Math.max(userPrice - userBuy, 0);
+      const totalRev = userPrice * qty;
+      const totalCap = userBuy * qty;
+      const totalProf = Math.max(totalRev - totalCap, 0);
+
       document.getElementById('productPrice').textContent = formatCurrency(userPrice);
-      document.getElementById('productMargin').textContent = formatCurrency(userPrice);
+      const buyEl = document.getElementById('productBuyPrice');
+      if (buyEl) buyEl.textContent = formatCurrency(userBuy);
+      document.getElementById('productMargin').textContent = formatCurrency(unitProfit);
       document.getElementById('productCommission').textContent = formatCurrency(unitEarn);
-      document.getElementById('totalPrice').textContent = formatCurrency(userPrice * qty);
+      document.getElementById('totalPrice').textContent = formatCurrency(totalRev);
+      const capPreviewEl = document.getElementById('totalCapitalPreview');
+      if (capPreviewEl) capPreviewEl.textContent = formatCurrency(totalCap);
       const profitPreviewEl = document.getElementById('totalProfitPreview');
-      if (profitPreviewEl) profitPreviewEl.textContent = formatCurrency(userPrice * qty);
+      if (profitPreviewEl) profitPreviewEl.textContent = formatCurrency(totalProf);
       const ratePreviewEl = document.getElementById('previewRateLabel');
       if (ratePreviewEl) ratePreviewEl.textContent = `${activeRate}%`;
       document.getElementById('totalEarnings').textContent = formatCurrency(unitEarn * qty);
@@ -3787,7 +3841,7 @@
       const quantity = parseInt(document.getElementById('productQuantity').value) || 1;
       const price = parseFloat(document.getElementById('productPriceInput').value) || Number(product.sellPrice || 0);
 
-      const buyPrice = 0;
+      const buyPrice = parseFloat(document.getElementById('saleBuyPriceInput')?.value) || Number(product.buyPrice ?? product.capital ?? 0);
 
       const targetUser = getSelectedSaleTargetUser();
       const targetUsername = targetUser ? targetUser.username : currentSession.username;
@@ -3870,6 +3924,9 @@
       document.getElementById('productSelect').value = sale.productId;
       document.getElementById('productQuantity').value = sale.quantity || 1;
       document.getElementById('productPriceInput').value = Number(sale.price || 0).toFixed(2);
+      if (document.getElementById('saleBuyPriceInput')) {
+        document.getElementById('saleBuyPriceInput').value = Number(sale.buyPrice || 0).toFixed(2);
+      }
       document.getElementById('buyerUsernameInput').value = sale.buyerUsername || '';
       document.getElementById('accountEmailInput').value = sale.accountEmail || '';
       document.getElementById('productSoldStatus').value = sale.sold ? 'yes' : 'no';
@@ -3941,7 +3998,7 @@
       const tbody = document.getElementById('bulkSalesTableBody');
       const tr = document.createElement('tr');
       tr.id = `bulk-row-${rowId}`;
-      const listToDisplay = (subscriptionProducts && subscriptionProducts.length > 0) ? subscriptionProducts : products;
+      const listToDisplay = getAllSubscriptionProducts();
       const opts = listToDisplay.map(p => {
         const sPrice = p.soloPrice || p.sellPrice || p.fullPrice || 0;
         return `<option value="${p.id}" data-sell="${sPrice}">${p.name}</option>`;
@@ -4082,7 +4139,7 @@
       e.preventDefault();
       if (!isOwner()) return;
       const name = document.getElementById('subProductName').value.trim();
-      const buyPrice = 0;
+      const buyPrice = parseFloat(document.getElementById('saleBuyPriceInput')?.value) || Number(product.buyPrice ?? product.capital ?? 0);
       const fullPrice = parseFloat(document.getElementById('subFullPrice').value) || 0;
       const soloPrice = parseFloat(document.getElementById('subSoloPrice').value) || 0;
       const sharedPrice = parseFloat(document.getElementById('subSharedPrice').value) || 0;
@@ -4094,9 +4151,11 @@
       const id = Date.now();
       showSyncingIndicator();
       getRef('subscriptionProducts/' + id).set({
-        id, name, buyPrice, fullPrice, soloPrice, sharedPrice, totalProfiles, profiles,
+        id: String(id), name, buyPrice: 0, fullPrice, soloPrice, sharedPrice, totalProfiles, profiles,
+        sellPrice: soloPrice || fullPrice || sharedPrice,
         createdAt: new Date().toISOString().split('T')[0]
       }).then(() => {
+        ensureAppInList(name);
         this.reset();
         closeAddSubscriptionModal();
         showToast('Subscription product added!');
@@ -4195,12 +4254,12 @@
             <div class="item-card-header">
               <div>
                 <div class="item-card-title">${p.name}</div>
-                <div class="item-card-sub">${p.totalProfiles || 5} profiles capacity</div>
+                <div class="item-card-sub">${p.totalProfiles || 5} profiles capacity • Capital: ${formatCurrency(Number(p.buyPrice ?? p.capital ?? 0))}</div>
               </div>
-              ${isOwner() ? `
+                            ${isOwner() ? `
                 <div style="display:flex; gap:6px;">
-                  <button class="btn btn-sm btn-outline" onclick="editSubscriptionProduct('${p.id}')">Edit</button>
-                  <button class="btn btn-sm btn-danger" onclick="deleteSubscriptionProduct('${p.id}')">✕</button>
+                  <button type="button" class="btn btn-sm btn-outline" data-id="${p.id}" onclick="editSubscriptionProduct(this.dataset.id || '${p.id}')">Edit</button>
+                  <button type="button" class="btn btn-sm btn-danger" data-id="${p.id}" onclick="deleteSubscriptionProduct(this.dataset.id || '${p.id}')">✕</button>
                 </div>
               ` : ''}
             </div>
@@ -4223,40 +4282,75 @@
       }).join('');
     }
 
-    function editSubscriptionProduct(id) {
-      if (!isOwner()) return;
-      const p = subscriptionProducts.find(x => String(x.id) === String(id));
-      if (!p) return;
-      document.getElementById('editSubProductId').value = p.id;
-      document.getElementById('editSubProductName').value = p.name;
-      document.getElementById('editSubFullPrice').value = p.fullPrice || 0;
-      document.getElementById('editSubSoloPrice').value = p.soloPrice || 0;
-      document.getElementById('editSubSharedPrice').value = p.sharedPrice || 0;
-      document.getElementById('editSubTotalProfiles').value = p.totalProfiles || 5;
-      document.getElementById('editSubscriptionModal').classList.add('show');
+        function editSubscriptionProduct(id) {
+      if (!isOwner()) {
+        showToast('Only owners can edit products', true);
+        return;
+      }
+      if (!id) return;
+      const allSubs = getAllSubscriptionProducts();
+      const p = allSubs.find(x => String(x.id) === String(id));
+      if (!p) {
+        showToast('Product not found: ' + id, true);
+        return;
+      }
+      const idEl = document.getElementById('editSubProductId');
+      const nameEl = document.getElementById('editSubProductName');
+      const fullEl = document.getElementById('editSubFullPrice');
+      const soloEl = document.getElementById('editSubSoloPrice');
+      const sharedEl = document.getElementById('editSubSharedPrice');
+      const totalEl = document.getElementById('editSubTotalProfiles');
+      const modalEl = document.getElementById('editSubscriptionModal');
+
+      if (idEl) idEl.value = p.id;
+      if (nameEl) nameEl.value = p.name || '';
+      const buyEl = document.getElementById('editSubBuyPrice');
+      if (buyEl) buyEl.value = Number(p.buyPrice ?? p.capital ?? 0).toFixed(2);
+      if (fullEl) fullEl.value = Number(p.fullPrice !== undefined && p.fullPrice !== null ? p.fullPrice : (p.sellPrice || 0)).toFixed(2);
+      if (soloEl) soloEl.value = Number(p.soloPrice !== undefined && p.soloPrice !== null ? p.soloPrice : (p.sellPrice || 0)).toFixed(2);
+      if (sharedEl) sharedEl.value = Number(p.sharedPrice !== undefined && p.sharedPrice !== null ? p.sharedPrice : (p.sellPrice || 0)).toFixed(2);
+      if (totalEl) totalEl.value = p.totalProfiles || 5;
+      if (modalEl) modalEl.classList.add('show');
     }
-    function closeEditSubscriptionModal() { document.getElementById('editSubscriptionModal').classList.remove('show'); }
+    window.editSubscriptionProduct = editSubscriptionProduct;
+
+    function closeEditSubscriptionModal() { 
+      const modalEl = document.getElementById('editSubscriptionModal');
+      if (modalEl) modalEl.classList.remove('show'); 
+    }
+    window.closeEditSubscriptionModal = closeEditSubscriptionModal;
 
     function saveSubscriptionEdit(e) {
       e.preventDefault();
+      if (!isOwner()) {
+        showToast('Only owners can edit products', true);
+        return;
+      }
       const id = document.getElementById('editSubProductId').value;
-      const existing = subscriptionProducts.find(x => String(x.id) === String(id));
-      if (!existing) return;
+      const allSubs = getAllSubscriptionProducts();
+      const existing = allSubs.find(x => String(x.id) === String(id));
+      if (!existing) {
+        showToast('Product not found to update', true);
+        return;
+      }
       const newTotal = parseInt(document.getElementById('editSubTotalProfiles').value) || existing.totalProfiles || 5;
       const profiles = [...(existing.profiles || [])];
       while (profiles.length < newTotal) {
         profiles.push({ number: profiles.length + 1, sold: false, soldBy: '', soldDate: '' });
       }
       const name = document.getElementById('editSubProductName').value.trim();
+      const buyPrice = parseFloat(document.getElementById('editSubBuyPrice')?.value) || 0;
       const fullPrice = parseFloat(document.getElementById('editSubFullPrice').value) || 0;
       const soloPrice = parseFloat(document.getElementById('editSubSoloPrice').value) || 0;
       const sharedPrice = parseFloat(document.getElementById('editSubSharedPrice').value) || 0;
 
       const updated = {
         ...existing,
+        id: String(id),
         name,
         category: name,
-        buyPrice: 0,
+        buyPrice,
+        capital: buyPrice,
         fullPrice,
         soloPrice,
         sharedPrice,
@@ -4264,36 +4358,46 @@
         totalProfiles: newTotal,
         profiles: profiles.slice(0, newTotal)
       };
+      const wasFromProducts = !!existing.isFromProducts;
+      delete updated.isFromProducts;
+
       showSyncingIndicator();
-      getRef('subscriptionProducts/' + id).update(updated).then(() => {
+      getRef('subscriptionProducts/' + id).set(updated).then(() => {
+        if (wasFromProducts) {
+          getRef('products/' + id).remove().catch(() => {});
+        }
         ensureAppInList(name);
         closeEditSubscriptionModal();
         showToast('Subscription updated!');
+      }).catch(err => {
+        console.error('Save subscription error:', err);
+        showToast('Error saving: ' + (err.message || err), true);
       });
     }
+    window.saveSubscriptionEdit = saveSubscriptionEdit;
 
     function deleteSubscriptionProduct(id) {
-      if (!isOwner() || !confirm('Delete this subscription product?')) return;
-      getRef('subscriptionProducts/' + id).remove().then(() => showToast('Deleted'));
-    }
-
-    
-    // =================== APPS & SERVICES STATE ===================
-    let defaultAppsList = ['ChatGPT', 'Netflix', 'Spotify', 'Canva', 'YouTube', 'Disney+', 'Prime Video', 'HBO Max', 'VIU', 'Vivamax', 'CapCut'];
-    let shopApps = [...defaultAppsList];
-
-    function ensureAppInList(appName) {
-      if (!appName) return;
-      const clean = appName.trim();
-      if (!clean) return;
-      if (!shopApps.some(a => a.toLowerCase() === clean.toLowerCase())) {
-        shopApps.push(clean);
-        if (isOwner()) {
-          getRef('settings/appsList').set(shopApps);
-        }
-        renderAppsInDropdowns();
+      if (!isOwner()) {
+        showToast('Only owners can delete products', true);
+        return;
       }
+      if (!id || !confirm('Delete this subscription product?')) return;
+      const allSubs = getAllSubscriptionProducts();
+      const existing = allSubs.find(x => String(x.id) === String(id));
+      const wasFromProducts = existing && existing.isFromProducts;
+
+      showSyncingIndicator();
+      Promise.all([
+        getRef('subscriptionProducts/' + id).remove().catch(() => {}),
+        wasFromProducts ? getRef('products/' + id).remove().catch(() => {}) : Promise.resolve()
+      ]).then(() => {
+        showToast('Subscription deleted!');
+      }).catch(err => {
+        console.error('Delete subscription error:', err);
+        showToast('Error deleting: ' + (err.message || err), true);
+      });
     }
+    window.deleteSubscriptionProduct = deleteSubscriptionProduct;
 
     function renderAppsInDropdowns(selectedVal = '') {
       // 1. Datalist for inputs
